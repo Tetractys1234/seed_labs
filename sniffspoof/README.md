@@ -30,11 +30,11 @@ The final part of setting up requires getting the network interface that our Doc
 
 We see the device name on my machine is br-8928c17f4ab4 this is important so I copy it into a textfile for use later.
 
-The Docker is set up and I have the terminals open! Things are looking good so far, but there is a lot more to learn about docker and the environment we have set up here beyond the basic instructions provided by the lab. Seed has posted a comprehensive tutorial for using Docker with their labs and I will keep the link for reference https://github.com/seed-labs/seed-labs/blob/master/manuals/docker/SEEDManual-Container.md
+The Docker is set up and I have the terminals open! Things are looking good so far, but there is a lot more to learn about docker and the environment we have set up here beyond the basic instructions provided by the lab. Seed has posted a comprehensive tutorial for using Docker with their labs and I will keep the link for reference [Docker Tutorial](https://github.com/seed-labs/seed-labs/blob/master/manuals/docker/SEEDManual-Container.md)
 
 Using Scapy to Sniff and Spoof Packets
 --------------------------------------
 
 
 
-https://seedsecuritylabs.org/Labs_20.04/Networking/Sniffing_Spoofing/
+[Packet Sniffing/Spoofing Lab](https://seedsecuritylabs.org/Labs_20.04/Networking/Sniffing_Spoofing/)
