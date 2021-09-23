@@ -24,5 +24,17 @@ Next I want to make sure I am able to have a shell open in both the attacker and
 
 ![dockps](img/dockps.png)
 
+The final part of setting up requires getting the network interface that our Docker images will be communicating over. The docker-compose.yml script shows that we have assigned the IP 10.9.0.0/24 to the network so we will need to identify the network device on our VM that matches the script setup. So lets check `ifconfig`
+
+![ifconfig](img/ifconfig.png)
+
+We see the device name on my machine is br-8928c17f4ab4 this is important so I copy it into a textfile for use later.
+
+The Docker is set up and I have the terminals open! Things are looking good so far, but there is a lot more to learn about docker and the environment we have set up here beyond the basic instructions provided by the lab. Seed has posted a comprehensive tutorial for using Docker with their labs and I will keep the link for reference https://github.com/seed-labs/seed-labs/blob/master/manuals/docker/SEEDManual-Container.md
+
+Using Scapy to Sniff and Spoof Packets
+--------------------------------------
+
+
 
 https://seedsecuritylabs.org/Labs_20.04/Networking/Sniffing_Spoofing/
