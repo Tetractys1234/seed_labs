@@ -47,7 +47,35 @@ creates an IP packet for us
 
 ![ippacket](img/scapyintro.png)
 
+Lets use Scapy to do some packet sniffing for us.
 
+### Task 1.1 Sniffing Packets
+
+We are going to take the sample code and run it on our vm, you can find the script in the repo or simply copy/paste it, but be careful as your interface name may be different. notice how sniff requires an interface name, iface, to be specified. iface can be one interface or multiple (use a list).
+```python
+
+#!/usr/bin/env python3
+
+def print_pkt(pkt):
+	pkt.show()
+
+pkt = sniff(iface='br-8928c17f4ab4' , filter='icmp', prn=print_pkt)
+
+
+```
+#### Task 1.1A
+
+We will sniff from the VM to start. The filter is set for ICMP packets so lets send a ping to the container network interface. Don't forget that root privilege will be needed to view packets. Sending a ping to the br-8928c17f4ab4 interface from the ATTACK container we can sniff the ICMP activity from our VM.
+
+![attackping](img/attackping.png)
+
+Ping sent!
+
+![icmpreceived](img/icmpscapy.png)
+
+Running the same program without root privilege results in an Operation not permitted value. Why? Direct access to network devices is restricted to root users. If you didnt need root privilege then every user on a system could potentially control network adapters which would be a bad idea.
+
+#### Task 1.1B 
 
 
 [Packet Sniffing/Spoofing Lab](https://seedsecuritylabs.org/Labs_20.04/Networking/Sniffing_Spoofing/)
