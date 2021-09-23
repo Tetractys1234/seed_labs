@@ -18,7 +18,7 @@ You can download the Labsetup.zip from the Lab website which contains scripts to
 
 Once you compose the docker images you can use the alias command given to boot up our Docker network
 
-![dcup](seed_labs/sniffspoof/img/dockerstart.png)
+![dcup](img/dockerstart.png)
 
  
 
