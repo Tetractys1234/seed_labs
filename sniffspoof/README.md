@@ -35,6 +35,13 @@ The Docker is set up and I have the terminals open! Things are looking good so f
 Using Scapy to Sniff and Spoof Packets
 --------------------------------------
 
+Scapy is a Python program enabling user to send, sniff, dissect, and forge network packets. Time to learn a bit about it for the upcoming tasks!
 
+running the example script:
+```python 
+from scapy.all import * #We import all modules from Scapy to use
+a = IP()
+a.show()
+```
 
 [Packet Sniffing/Spoofing Lab](https://seedsecuritylabs.org/Labs_20.04/Networking/Sniffing_Spoofing/)
