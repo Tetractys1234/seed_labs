@@ -43,5 +43,11 @@ from scapy.all import * #We import all modules from Scapy to use
 a = IP()
 a.show()
 ```
+creates an IP packet for us
+
+![ippacket](img/scapyintro.png)
+
+
+
 
 [Packet Sniffing/Spoofing Lab](https://seedsecuritylabs.org/Labs_20.04/Networking/Sniffing_Spoofing/)
