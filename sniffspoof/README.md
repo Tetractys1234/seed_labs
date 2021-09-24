@@ -96,4 +96,25 @@ And say we want to send a TCP packet on the same interface, we get no packets sh
 
 The next task requires us to capture ANY TCP packets that come from a particular IP with a destination port 23. Using the filter option in the sniff() function from scapy allows us to accomplish this simply.
 
+We use the filters option in sniff() scapy function like this:
+```python
+#Task 1.1B --- Capturing only TCP packets going to port 23
+def tcp_port23():
+    pkt = sniff(iface='br-8928c17f4ab4', filter='tcp and host 9.9.9.9 and port 23', prn=pprint_pkt)
+```
+
+Crafting and sending a packet on my attacking machine gets us no response from the sniffer
+
+![tcpwrong](img/tcpwrong.png)
+
+![nothing](img/nothingsniff.png)
+
+When the packet is set to what we filter for however we receive results.
+
+![tcpright](img/tcpright.png)
+
+![tcpsniff](img/tcpsniff.png)
+
+The next task is to set the filter to capture packets coming from or going to a particular subnet. So pick any subnet that the VM is not attached to and try it out.
+
 [Packet Sniffing/Spoofing Lab](https://seedsecuritylabs.org/Labs_20.04/Networking/Sniffing_Spoofing/)

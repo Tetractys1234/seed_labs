@@ -21,7 +21,7 @@ def icmp_only():
 
 #Task 1.1B --- Capturing only TCP packets going to port 23
 def tcp_port23():
-    pkt = sniff(iface='br-8928c17f4ab4', filter='tcp and ( port 23 )', prn=pprint_pkt)
+    pkt = sniff(iface='br-8928c17f4ab4', filter='tcp and host 9.9.9.9 and port 23', prn=pprint_pkt)
 
 #Task 1.1B --- Capturing packets FROM a subnet
 def from_subnet():
@@ -34,8 +34,8 @@ def to_subnet():
 ################################################################################
 
 # Run tasks
-icmp_only()
-#tcp_port23()
+#icmp_only()
+tcp_port23()
 #from_subnet()
 #to_subnet()
 
