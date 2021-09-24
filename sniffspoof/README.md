@@ -126,6 +126,7 @@ With this in the python script I sent a packet from my Attacker container to 1.2
 ![pingsubnet](img/pingsubnet.png)
 
 The filter worked!
+
 ![subnetsniff](img/subnetsniff.png)
 
 ### TASK 1.2 Spoofing ICMP Packets
