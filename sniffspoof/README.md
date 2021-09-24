@@ -77,5 +77,23 @@ Running the same program without root privilege results in an Operation not perm
 
 #### Task 1.1B 
 
-stufd
+After messing around with Scapy for awhile trying to get its built in sprintf function to work I caved and created a print function
+to neatly display the ICMP traffic like \[SOURCE\] -> \[DEST\]. Now we can test out the filter functionality in scapy.
+
+First we create a packet on the attacker container using scapy
+![scapypacket](img/scapyping)
+
+Then with our sniffer.py running a new function: 
+```python
+#Task 1.1B --- Capturing only the ICMP packets
+def icmp_only():
+    pkt = sniff(iface='br-8928c17f4ab4' , filter='icmp', prn=pprint_pkt)
+```
+We see the ICMP packets neatly on the VM
+![icmpsniff](img/icmpsniff.png)
+
+And say we want to send a TCP packet on the same interface, we get no packets showing on our VM terminal. Thanks BPF!
+
+The next task requires us to capture ANY TCP packets that come from a particular IP with a destination port 23. Using the filter option in the sniff() function from scapy allows us to accomplish this simply.
+
 [Packet Sniffing/Spoofing Lab](https://seedsecuritylabs.org/Labs_20.04/Networking/Sniffing_Spoofing/)
