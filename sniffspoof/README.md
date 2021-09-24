@@ -115,6 +115,21 @@ When the packet is set to what we filter for however we receive results.
 
 ![tcpsniff](img/tcpsniff.png)
 
-The next task is to set the filter to capture packets coming from or going to a particular subnet. So pick any subnet that the VM is not attached to and try it out.
+The next task is to set the filter to capture packets coming from or going to a particular subnet. So pick any subnet that the VM is not attached to and try it out. Since we don't want a subnet the VM is attached to we need to change the interface we are observing. So I used the filter function to search for traffic on the internet facing interface. I then sent a ping to 1.2.3.4 and captured it leaving the attacker container to its destination. I used a class A subnet 
+```python
+#Task 1.1B --- Capturing packets FROM a subnet
+def tofrom_subnet():
+    pkt = sniff(iface='enp0s3', filter='net 1.0.0.0 mask 255.0.0.0', count=1,prn=pprint_pkt)
+```
+
+With this in the python script I sent a packet from my Attacker container to 1.2.3.4
+![pingsubnet](img/pingsubnet.png)
+
+The filter worked!
+![subnetsniff](img/subnetsniff.png)
+
+### TASK 1.2 Spoofing ICMP Packets
+
+stuff.
 
 [Packet Sniffing/Spoofing Lab](https://seedsecuritylabs.org/Labs_20.04/Networking/Sniffing_Spoofing/)

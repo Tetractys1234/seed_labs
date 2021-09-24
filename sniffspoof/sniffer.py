@@ -24,19 +24,14 @@ def tcp_port23():
     pkt = sniff(iface='br-8928c17f4ab4', filter='tcp and host 9.9.9.9 and port 23', prn=pprint_pkt)
 
 #Task 1.1B --- Capturing packets FROM a subnet
-def from_subnet():
-    pkt = IP()
-
-#Task 1.1B --- Capturing packets TO a subnet
-def to_subnet():
-    pkt=IP()
+def tofrom_subnet():
+    pkt = sniff(iface='enp0s3', filter='net 1.0.0.0 mask 255.0.0.0', count=1,prn=pprint_pkt)
 
 ################################################################################
 
 # Run tasks
 #icmp_only()
-tcp_port23()
-#from_subnet()
-#to_subnet()
+#tcp_port23()
+tofrom_subnet()
 
 ################################################################################
