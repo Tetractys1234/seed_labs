@@ -81,7 +81,7 @@ After messing around with Scapy for awhile trying to get its built in sprintf fu
 to neatly display the ICMP traffic like \[SOURCE\] -> \[DEST\]. Now we can test out the filter functionality in scapy.
 
 First we create a packet on the attacker container using scapy
-![scapypacket](img/scapyping)
+![scapypacket](img/scapysend.png)
 
 Then with our sniffer.py running a new function: 
 ```python
