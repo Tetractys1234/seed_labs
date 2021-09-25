@@ -131,6 +131,29 @@ The filter worked!
 
 ### TASK 1.2 Spoofing ICMP Packets
 
-stuff.
+We have already used spoofed packets to easily test our filter settings, but lets go over the deatils here. Scapy makes it really intuitive to create spoofed packets.
+
+```python
+# We will construct a ICMP packet layer by layer and send it
+def spoof_icmp():
+
+    print("SENDING SPOOFED ICMP------------\n")
+    a = IP()
+    a.dst = '10.9.0.5'
+    a.src = '1.2.3.4'
+    b = ICMP()
+    pkt = a/b
+    send(pkt)
+
+spoof_icmp()
+```
+
+This script comes directly from the SEED lab instructions except we have inserted a new source IP address and when we execute the script and monitor the network device of our attacker machine we can see that the ICMP packet is sent out with the spoofed source IP address. I used wireshark, but our packet sniffer.py would work to see this as well.
+
+![spooficmp](img/spooficmp.png)
+
+### Task 1.3 Traceroute
+
+
 
 [Packet Sniffing/Spoofing Lab](https://seedsecuritylabs.org/Labs_20.04/Networking/Sniffing_Spoofing/)
