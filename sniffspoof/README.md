@@ -182,7 +182,7 @@ if __name__ == "__main__":
 
 This simple tool will output the IP of the source from the packets received as well as the code received at the end. The ICMP codes are important to a tool like traceroute as they allow us to know at what point we reach the destination, or at what point are our probes stopped. A difference in this program is that the scapy sr() function has been given a range of packets to send. It will send ALL packets at once and not one by one like a traceroute -I \[address\] will give us.
 
-![traceroutepy](img/traceroute.py)
+![traceroutepy](img/traceroutepy.png)
 
 In my example you see the tool probing two addresses. I didn't refine it further since there is still much more to go through in the lab!
 
