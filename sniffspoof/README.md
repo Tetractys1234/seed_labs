@@ -154,6 +154,42 @@ This script comes directly from the SEED lab instructions except we have inserte
 
 ### Task 1.3 Traceroute
 
+The SEED labs want us to create a simple traceroute tool with scapy. So we will do like traceroute does and send an echo-request with a time to live of 1 and listen for an ICMP "Time Exceeded" response then increment the time-to-live until we get an ICMP "port unreachable". The last packet we send will either be the max ttl we assigned or the host. For reference I referred to a workshop on scapy from user [0xbharath](https://0xbharath.github.io/art-of-packet-crafting-with-scapy/network_recon/traceroute/index.html) on github
+
+```python
+#--Program is interactable, change address and ttl as you like with
+#  command line arguments
+# REF: https://0xbharath.github.io/art-of-packet-crafting-with-scapy/network_recon/traceroute/index.html
+
+def scapy_traceroute(addr, ttl):
+
+    ans,unans=sr(IP(dst=addr,ttl=(1,ttl))/ICMP(), timeout=5)
+    ans.summary( lambda s,r : r.sprintf("%IP.src% CODE: %ICMP.type%"))
+
+
+if __name__ == "__main__":
+
+    if len(sys.argv) < 2 or len(sys.argv) > 3:
+        print("Simple Scapy traceroute program:\n",
+              "USAGE: traceroute.py [ADDRESS] , [TTL]")
+        sys.exit(0)
+
+    else:
+        addr = sys.argv[1]
+        ttl = int(sys.argv[2])
+        scapy_traceroute(addr, ttl)
+```
+
+This simple tool will output the IP of the source from the packets received as well as the code received at the end. The ICMP codes are important to a tool like traceroute as they allow us to know at what point we reach the destination, or at what point are our probes stopped. A difference in this program is that the scapy sr() function has been given a range of packets to send. It will send ALL packets at once and not one by one like a traceroute -I \[address\] will give us.
+
+![traceroutepy](img/traceroute.py)
+
+In my example you see the tool probing two addresses. I didn't refine it further since there is still much more to go through in the lab!
+
+
+### Task 1.4 Sniffing and-then Spoofing
+
+Now we will use scapy to create a Sniff and-then Spoof program. It will run on the VM and interact with the User container. 
 
 
 [Packet Sniffing/Spoofing Lab](https://seedsecuritylabs.org/Labs_20.04/Networking/Sniffing_Spoofing/)
