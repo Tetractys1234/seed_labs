@@ -191,9 +191,12 @@ In my example you see the tool probing two addresses. I didn't refine it further
 
 Now we will use scapy to create a Sniff and-then Spoof program. It will run on the VM and interact with the User container. The Computer and Internet Security book by Wenliang Du gives us a nice example to use for the program. I've adapted it for the exercise. REMEMBER!!! The network interface on your setup will be different than mine so be sure to specify the correct iface. I ran these commands from the host interface while sniff_spoof_icmp.py was running from my vm:
 
-`ping -c 4 google.com' An existing host on the internet
+`ping -c 4 google.com` An existing host on the internet
+
 `ping -c 4 1.2.3.4` A non-existing host on the internet
+
 `ping -c 4 10.9.0.99` A non-existing host on the LAN
+
 `ping -c 4 8.8.8.8` Another existing host on the internet.
 
 The python program appeared to work! At least for the existing hosts outside of the local network.
