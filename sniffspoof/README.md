@@ -262,11 +262,13 @@ pcap_loop invokes a loop running over the socket to grab any packets. The CALLBA
 Before the callback function is written we need to define the different layers of our packet in structs in order to type cast our packet into readable chunks.
 
 Before typecasting:
-PACKET
+PACKET:
+
 \[....................\]
 
 
 After:
+
 \[\[ETHER]\[IP\]\[.....\]
 
 
