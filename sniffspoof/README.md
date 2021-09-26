@@ -233,6 +233,59 @@ For this part of the lab the C code gets compiled in the VM and then run out of 
 
 ### Task 2.1 Writing a Packet Sniffing program
 
+Writing a sniffer program in C requires a bit more attention to detail than scapy, but the concept is similar.
+Firstly we need to open capture session on the specified NIC:
+
+```C
+handle = pcap_open_live("br-0229d0abdb25", BUFSIZ, 1, 1000, errbuf);
+```
+
+pcap_open_live is the library function we use to initialize the session. It fires up a socket for our sniffer to use
+
+```C
+pcap_compile(handle, &fp, filter_exp, 0, net);
+if (pcap_setfilter(handle, &fp) != 0) {
+        pcap_perror(handle, "Error:");
+        exit(EXIT_FAILURE);
+}
+```
+
+pcap_compile and pcap_setfilter compiles and sets the BPF filter on our opened socket
+
+```C
+pcap_loop(handle, -1, [CALLBACK FUNCTION], NULL);
+
+```
+
+pcap_loop invokes a loop running over the socket to grab any packets. The CALLBACK FUNCTION is invoked to perform more operations on the packet.
+
+Before the callback function is written we need to define the different layers of our packet in structs in order to type cast our packet into readable chunks.
+
+Before typecasting:
+PACKET
+\[                         ]
+ ^
+After:
+\[\[ETHER][IP][............]
++++++++++^+++^
+
+We can then increment the sizeof our structure on our captured packet to move the pointer around and analyze each partof it. I used the textbook here for reference and I won't post all of my code in the report, but here's the result of my program capturing packets on my attacker container coming from the host container over the docker network.
+
+![csniffer](img/csniffer.png)
+
+#### TASK 2.1A Understanding how a Sniffer works
+
+The sniffer works because of the packet capture library. So I will answer the questions in the lab here.
+
+##### 1.
+The library calls that are essential for a sniffer program are the calls that create a socket on which to access the NIC through our OS from our program and pcap_open_live() establishes this. We also need a way to understand what we are receiving, by compiling the BPF filter on our socket we are ready to use established filtering expressions on our packet and conversely understanding incoming packets as well we do this with pcap_compile and pcap_setfilter. We then need a call that will loop over the socket in order to capture and analyze the packets, which we have in pcap_loop. We also need a way to close the socket and pcap_close is the library call that we use.
+
+##### 2.
+Root privilege is required to run a sniffer program in because we need special access in order to perform actions directly on the NIC, specifically creating a raw socket and activating promiscuous mode on the NIC. The program would fail specifically at the operating system, as the library call is run that opens a raw socket to the NIC. The operating system will attempt the system call required and the kernel will determine the user's privileges and deny the program access to use the system calls invoked by pcap if their privileges are insufficient.
+
+
+##### 3.
+Promiscuous mode allows the NIC to listen to ALL the traffic on its LAN and without promiscuous mode enabled the NIC only see traffic passing to that particular interface. HOWEVER Since the attacker container has been set into host mode it allows the attacker to see ALL traffics on the LAN we set up, it sees all the network interfaces of the host so setting the promiscuous mode to 0 or 1 on the attacker container gives the same result.
 
 
 [Packet Sniffing/Spoofing Lab](https://seedsecuritylabs.org/Labs_20.04/Networking/Sniffing_Spoofing/)
