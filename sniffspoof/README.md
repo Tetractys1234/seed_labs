@@ -288,4 +288,34 @@ Root privilege is required to run a sniffer program in because we need special a
 Promiscuous mode allows the NIC to listen to ALL the traffic on its LAN and without promiscuous mode enabled the NIC only see traffic passing to that particular interface. HOWEVER Since the attacker container has been set into host mode it allows the attacker to see ALL traffics on the LAN we set up, it sees all the network interfaces of the host so setting the promiscuous mode to 0 or 1 on the attacker container gives the same result.
 
 
+#### TASK 2.1B Writing Filters
+
+We now need to write BPF filter expressions for the sniffer program to capture specific packets.
+
+Capturing ICMP packets between two specific hosts:
+![icmpbtw2hosts](img/icmpbtw2hosts.png)
+
+Capturing TCP packets with a destination port number in the range of 10 to 100:
+![tcp10to1000](img/tcp10to100.png)
+
+#### TASK 2.1C Sniffing Passwords
+Using our sniffer program to capture telnet passwords on the network we are monitoring:
+
+
+### TASK 2.2 Spoofing
+
+#### Task 2.2A Write a spoofing program
+
+#### Task 2.2B Spoof an ICMP echo request.
+
+#### Questions
+
+##### 4.
+##### 5.
+##### 6.
+
+
+### TASK 2.3 Sniff and Then Spoof
+*Bonus*
+
 [Packet Sniffing/Spoofing Lab](https://seedsecuritylabs.org/Labs_20.04/Networking/Sniffing_Spoofing/)
