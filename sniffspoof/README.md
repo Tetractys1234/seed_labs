@@ -224,4 +224,15 @@ Visually our network looks like this: (The VM is outside of the subnet, but stil
 
 When the Host machine tries to create a connection with another machine on its own subnet it first needs to know 10.9.0.99 's MAC address. Since there are no replies to the ARP request and the MAC is not stored in the ARP cache on the host machine a connection cannot be made. Ultimately this is why ARP exists, to route traffic on a LAN through the correct interfaces. Unless we modify our python code to also sniff and then spoof an ARP reply our host machine will not know how to communicate with 10.9.0.99 and the ping to it will never be able to be sent.
 
+
+Writing Programs to Sniff and Spoof Packets
+--------------------------------------------
+
+For this part of the lab the C code gets compiled in the VM and then run out of the volumes directory (shared by attacker and VM) and execute the code inside the attacker container. 
+
+
+### Task 2.1 Writing a Packet Sniffing program
+
+
+
 [Packet Sniffing/Spoofing Lab](https://seedsecuritylabs.org/Labs_20.04/Networking/Sniffing_Spoofing/)
