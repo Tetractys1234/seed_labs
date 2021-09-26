@@ -189,7 +189,36 @@ In my example you see the tool probing two addresses. I didn't refine it further
 
 ### Task 1.4 Sniffing and-then Spoofing
 
-Now we will use scapy to create a Sniff and-then Spoof program. It will run on the VM and interact with the User container. 
+Now we will use scapy to create a Sniff and-then Spoof program. It will run on the VM and interact with the User container. The Computer and Internet Security book by Wenliang Du gives us a nice example to use for the program. I've adapted it for the exercise. REMEMBER!!! The network interface on your setup will be different than mine so be sure to specify the correct iface. I ran these commands from the host interface while sniff_spoof_icmp.py was running from my vm:
 
+`ping -c 4 google.com' An existing host on the internet
+`ping -c 4 1.2.3.4` A non-existing host on the internet
+`ping -c 4 10.9.0.99` A non-existing host on the LAN
+`ping -c 4 8.8.8.8` Another existing host on the internet.
+
+The python program appeared to work! At least for the existing hosts outside of the local network.
+
+![pingspoofs](img/pingspoofs.png)
+
+So why did the local LAN request not go through? We need to understand how the host machine is determining the location of 10.9.0.99, which is the ARP protocol. This is what happened over the network interface when the ping to 10.9.0.99 was sent:
+
+![pingspoofshark](img/pingspoofshark.png)
+
+Because 10.9.0.5 and 10.9.0.99 are on the same subnet (remember we set up the machines using the docker-compose.yml script? Yea its in there! The script assigns the network 10.9.0.0 to a subnet:
+
+```
+networks:
+    net-10.9.0.0:
+        name: net-10.9.0.0
+        ipam:
+            config:
+                - subnet: 10.9.0.0/24
+```
+
+Visually our network looks like this: (The VM is outside of the subnet, but still has access to the network device)
+
+![subnet](img/subnet.png)
+
+When the Host machine tries to create a connection with another machine on its own subnet it first needs to know 10.9.0.99 's MAC address. Since there are no replies to the ARP request and the MAC is not stored in the ARP cache on the host machine a connection cannot be made. Ultimately this is why ARP exists, to route traffic on a LAN through the correct interfaces. Unless we modify our python code to also sniff and then spoof an ARP reply our host machine will not know how to communicate with 10.9.0.99 and the ping to it will never be able to be sent.
 
 [Packet Sniffing/Spoofing Lab](https://seedsecuritylabs.org/Labs_20.04/Networking/Sniffing_Spoofing/)
