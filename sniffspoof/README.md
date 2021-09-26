@@ -263,11 +263,12 @@ Before the callback function is written we need to define the different layers o
 
 Before typecasting:
 PACKET
-\[                         ]
- ^
+\[....................\]
+
+
 After:
-\[\[ETHER][IP][............]
-+++++++++^+++^
+\[\[ETHER]\[IP\]\[.....\]
+
 
 We can then increment the sizeof our structure on our captured packet to move the pointer around and analyze each partof it. I used the textbook here for reference and I won't post all of my code in the report, but here's the result of my program capturing packets on my attacker container coming from the host container over the docker network.
 
