@@ -296,10 +296,27 @@ Promiscuous mode allows the NIC to listen to ALL the traffic on its LAN and with
 We now need to write BPF filter expressions for the sniffer program to capture specific packets.
 
 Capturing ICMP packets between two specific hosts:
+
+This task just requires us to use a BPF expression in the filter_exp string to ensure we capture the correct packets with sniff_icmp program.
+
 ![icmpbtw2hosts](img/icmpbtw2hosts.png)
 
-Capturing TCP packets with a destination port number in the range of 10 to 100:
-![tcp10to1000](img/tcp10to100.png)
+With this expression in place we are capturing packets only between the Host container and the VM
+
+When I send out pings from the host:
+
+![icmp_sent_from_host](img/icmp_sent_from_host.png)
+
+And the output our sniff_icmp program outputs:
+
+![sniff_icmp_btw2hosts](img/sniff_icmp_btw2hosts.png)
+
+
+The next task is Capturing TCP packets with a destination port number in the range of 10 to 100:
+![tcp10to100](img/tcp10to100.png)
+
+Again we change our filter expression to reflect the packets we want to intercept on the interface.
+
 
 #### TASK 2.1C Sniffing Passwords
 Using our sniffer program to capture telnet passwords on the network we are monitoring:
