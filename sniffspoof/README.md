@@ -544,7 +544,7 @@ Interestingly when I send out 10 packets I only receive two responses. This is e
 ##### 4.
 The IP packet length cannot be set to an arbitrary value. For several reasons. If you set the ip length higher than the packet actually is, then the packet will become padded with zeros, so yes you can increase the size of your packet, but there is a limit As defined in RFC 791, the maximum packet length of an IPv4 packet including the IP header is 65,535 (216 − 1) bytes, and before we even think of making a packet that large we would need to fragment the packet because of the maximum transmission unit(MTU) across an ethernet wire. Trying to jam a very large packet onto the network will get error'd out by the socket before it is sent. playing with my code a bit, I can increse the size of my echo requests, but not to an arbitrary value. The largest I was able to make the packet length as was 1042 bytes.
 
-![1042](1042.png)
+![1042](img/1042.png)
 
 According to the man page if the message size is too large, then sendto() , the socket function we use to send our packet, will also report an errormessage EMSGSIZE. This means in order to increase the size of the message further we would need to handle breaking it down atomically in the code.
  
