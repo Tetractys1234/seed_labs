@@ -318,6 +318,41 @@ The next task is Capturing TCP packets with a destination port number in the ran
 Again we change our filter expression to reflect the packets we want to intercept on the interface.
 
 
+```C
+char filter_exp[] = "tcp portrange 10-100";
+
+```
+
+This filter will ensure we are getting the packets we want for the task. In order to test this I went ahead and defined a tcpheader structure inside the code to use the same technique for finding the beginning of the IP header, this time we need to multiply the IP header length field by 4 (since the header length is the number of words the header containrs) and then use the packet pointer to move ahead by the size of the ethernet header and the IP header to arrive at the TCP header. I used the pcap tutorial to find a very useful approach to creating the new header the pcap tutorial by Tim Carstens, here is the link for reference: [pcap programming tutorial](http://www.tcpdump.org/pcap.htm)
+
+```C
+ip_size = ip->iph_ihl * 4;
+struct tcpheader * tcp = (struct tcpheader *)(packet + sizeof(struct ethheader) + ip_size);
+```
+
+Then to verify that we are only getting the correct ports I've added in a print statement to pull the destination port (what we are filtering for) and print it out for us. We need to use the arpa/inet.h library for this in order to convert the network bytes into host bytes. If we don't convert the byte order then incorrect values will be printed! This function is provided by [arpa/inet.h](https://pubs.opengroup.org/onlinepubs/007908799/xns/arpainet.h.html):
+
+```C
+// This function from arpa/inet.h will convert NETWORK order bytes to HOST order bytes!
+uint16_t ntohs(uint16_t netshort);
+```
+
+To demonstrate the filter actually works I created a quick Scapy script it sends out tcp packets to 1.2.3.4 from port 10-500. Our program only picks up the first 91 packets (10-100 inclusive) so we know the filter expression works.
+
+Some screenshots:
+
+The scapy Script
+![scapysendtcpportrange](img/sendtcpportrange.png)
+
+
+The program receive packets
+
+![tcp1to10](img/tcp1to10.png)
+
+And skipped a bit to show where the packet capture did not continue after the scapy script executed on host
+
+![tcp100](img/tcp100.png)
+
 #### TASK 2.1C Sniffing Passwords
 Using our sniffer program to capture telnet passwords on the network we are monitoring:
 
