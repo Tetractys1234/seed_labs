@@ -354,7 +354,15 @@ And skipped a bit to show where the packet capture did not continue after the sc
 ![tcp1to10](img/tcp1to10.png)
 
 #### TASK 2.1C Sniffing Passwords
-Using our sniffer program to capture telnet passwords on the network we are monitoring:
+Using our sniffer program to capture telnet passwords on the network we are monitoring this requires us to modify our code again to be able to receive and read the payload data received/sent by each tcp packet. I changed my filter_expression slightly, to grab all traffic from and to port 23 since I will be capturing port 23(telnet) and need to see the password prompt to know when the unsuspecting user is entering their password (and clearly demonstrate it). Again I highly recommend checking out Tim Carsten's tutorial on using [pcaplib](http://www.tcpdump.org/pcap.htm) In my code sniff_telnet_pass.c I have used several of his functions to print out the payload part of the packet in a readable form. Lets take a look at how its working.
+
+The unsuspecting host logs into telnet, blissfully unaware that some malicious actor is listening to the traffic:
+
+![telnetfromhost](img/telnetfromhost.png)
+
+sniff_telnet_pass springs into action on the attacker container. Showing us exactly what is going on. And there it is, the password. Thanks!
+
+![telnetpassword](img/telnetpassword.png)
 
 
 ### TASK 2.2 Spoofing
