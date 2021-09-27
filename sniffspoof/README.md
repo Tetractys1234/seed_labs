@@ -342,7 +342,7 @@ To demonstrate the filter actually works I created a quick Scapy script it sends
 Some screenshots:
 
 The scapy Script
-![scapysendtcpportrange](img/sendtcpportrange.png)
+![scapysendtcpportrange](img/scapysendtcpportrange.png)
 
 
 The program receive packets
