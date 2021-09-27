@@ -347,11 +347,11 @@ The scapy Script
 
 The program receive packets
 
-![tcp1to10](img/tcp1to10.png)
+![tcp100](img/tcp100.png)
 
 And skipped a bit to show where the packet capture did not continue after the scapy script executed on host
 
-![tcp100](img/tcp100.png)
+![tcp1to10](img/tcp1to10.png)
 
 #### TASK 2.1C Sniffing Passwords
 Using our sniffer program to capture telnet passwords on the network we are monitoring:
