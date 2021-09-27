@@ -307,7 +307,7 @@ When I send out pings from the host:
 
 ![icmp_sent_from_host](img/icmp_sent_from_host.png)
 
-And the output our sniff_icmp program outputs:
+And the output our sniff_icmp program outputs only the icmp packets that were sent between the two hosts. The google.com pings were not intercepted by the sniff_icmp program
 
 ![sniff_icmp_btw2hosts](img/sniff_icmp_btw2hosts.png)
 

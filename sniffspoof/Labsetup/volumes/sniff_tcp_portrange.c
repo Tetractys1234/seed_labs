@@ -67,7 +67,8 @@ int main()
 	char errbuf[PCAP_ERRBUF_SIZE];
 	struct bpf_program fp;
 	// Filter expression to capture between Host container and VM
-	char filter_exp[] = "tcp portrange 10-100";
+	char filter_exp[] = "icmp && ((dst host 10.9.0.5 and src host 10.9.0.1) \
+			     || (src host 10.9.0.5 and dst host 10.9.0.1))";
 	bpf_u_int32 net;
 
 	
