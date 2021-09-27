@@ -366,16 +366,195 @@ sniff_telnet_pass springs into action on the attacker container. Showing us exac
 
 
 ### TASK 2.2 Spoofing
+Spoofing packets in C requires the use of Raw Sockets in order to be able to spoof the source IP address, when using normal sockets the OS will fill in that information for you. So we need to get our hands dirty and construct packets in the same fashion we were deconstructing packets with the sniffing program. We will need to also construct additional headers for the tasks ahead, like the [ICMP](https://datatracker.ietf.org/doc/html/rfc792) header. In short we will need some familiarity with socket programming in C to utilize our program to send packets.
 
 #### Task 2.2A Write a spoofing program
+For my program I closely followed Wenliang Du's Computer and Network Security book chapter 15. I just simply named it spoof.
+
+Firstly I construct the headers I will need for the program, I simply copied the ones I already had from the sniffing program and created a new one for the ICMP header based off the ICMP specification.
+
+```C
+/* IP Header */
+struct ipheader {
+        unsigned char           iph_ihl:4, // IP header length
+                                iph_ver:4; // IP version
+        unsigned char           iph_tos;   // Type of Service
+        unsigned short int      iph_len;   // Packet Length
+        unsigned short int      iph_ident; // Identification
+        unsigned short int      iph_flag:3,// Fragmentation flags
+                                iph_offset:13; // Flags offset
+        unsigned char           iph_ttl;   // Time to live
+        unsigned char           iph_protocol; // Protocol type
+        unsigned short int      iph_chksum;// IP datagram checksum
+        struct  in_addr         iph_sourceip; // Source IP address
+        struct  in_addr         iph_destip;   // Destination IP address
+};
+
+/* TCP Header */
+struct tcpheader {
+
+        unsigned short int      tcph_sport;     // Source Port
+        unsigned short int      tcph_dport;     // Destination Port
+        unsigned int            tcph_seq;       // Sequence number
+        unsigned int            tcph_ack;       // Acknowledgement Number
+        unsigned char           tcph_offs;      // data offset
+#define TH_OFF(th)      (((th)->tcph_offs & 0xf0) >> 4)
+        unsigned char           tcph_flags;     // TCP flags
+#define TH_FIN 0x01
+#define TH_SYN 0x02
+#define TH_RST 0x04
+#define TH_PUSH 0x08
+#define TH_ACK 0x10
+#define TH_URG 0x20
+#define TH_ECE 0x40
+#define TH_CWR 0x80
+#define TH_FLAGS (TH_FIN|TH_SYN|TH_RST|TH_ACK|TH_URG|TH_ECE|TH_CWR)
+        unsigned short int      tcph_win;       // Window
+        unsigned short int      tcph_sum;       // checksum
+        unsigned short int      tcph_urp;       // urgent pointer
+
+};
+
+
+/* ICMP header */
+
+struct icmpheader {
+        unsigned char   icmp_type;      // ICMP message type
+        unsigned char   icmp_code;      // error code
+        unsigned short int icmp_chksum; //Checksum for ICMP header and data
+        unsigned short int icmp_id;     //Identifier
+        unsigned short int icmp_seq;    // Sequence number
+};
+```
+
+I used the diagram here for reference.
+
+![icmpheader](img/icmpheader.png)
+
+The second step is to assemble the packet in our code
+```C
+                /******************************
+                1. Fill in the ICMP header
+                ******************************/
+		
+		// HERE WE DO POINTER MAGIC WITH THE BUFFER WE CREATE IN MAIN()
+                struct icmpheader *icmp = (struct icmpheader *)(buffer + sizeof(struct ipheader));
+                icmp->icmp_type = 8; // Type 8 is echo request, 0 is reply.
+                icmp->icmp_seq = 69;
+                icmp->icmp_id = 420;
+                //Calculate checksum for integrity
+                icmp->icmp_chksum = 0;
+                icmp->icmp_chksum = in_cksum((unsigned short *) icmp, sizeof(struct icmpheader));
+
+                /******************************
+                2. Fill in the IP Header
+                ******************************/
+
+		// See my code in the project for filling the IP header.
+```
+Filling in ALL of the fields of the ICMP header proved to be important because otherwise we ended up with a malformed packet being transmitted over the wire. This means we would never receive a reply to our spoofed packet. Though there are attacks that are based around malformed packets (See [ping of death](https://en.wikipedia.org/wiki/Ping_of_death) ) the next task asks us to specifically spoof a packet in order to receive a reply so I did not want my spoofed packets to be rejected.
+
+The next step is to ensure our checksum is valid for integrity and this was also code provided by the book which matches the [RFC 1071](https://datatracker.ietf.org/doc/html/rfc1071) specifications.
+
+```C
+/***********************************************************************
+ * Calculate a checksum for a given buffer
+ **********************************************************************/
+unsigned short in_cksum (unsigned short *buf, int length)
+{
+        unsigned short *w = buf;
+        int nleft = length;
+        int sum = 0;
+        unsigned short temp = 0;
+
+        /* The algorithm uses a 32-bit accumulator (sum), adds
+         * sequential 16 bit words to it, and at the end, folds
+         * back all the carry bits from the top 16 bits into the lower 16 bits.
+         */
+
+        while (nleft > 1) {
+                sum += *w++;
+                nleft -= 2;
+        }
+
+        /* treat the odd byte at the end (if any) */
+        if (nleft == 1) {
+                *(u_char *)(&temp) = *(u_char *)w ;
+                sum += temp;
+        }
+
+        /* Add back carry outs from the top 16 bits to low 16 bits */
+        sum = (sum >> 16) + (sum & 0xffff); // add hi 16 to low 16
+        sum += (sum >> 16); // add carry
+        return (unsigned short)(~sum);
+
+
+}
+```
+
+The checksum for the IP header is calculated by the OS, but when we are using other protocols we must calculate it ourselves.
+
+Finally we get to the raw socket programming where we send out assembled packet. Again I used the code Wenliang Du provides in Computer and Internet Security. With a few changes to suit our ICMP spoofing program
+
+```C
+/***********************************************************************
+ * Given a IP packet, send it out using a raw socket.
+ ***********************************************************************/
+void send_raw_ip_packet (struct ipheader* ip)
+{
+        struct sockaddr_in dest_info;
+        int enable = 1;
+
+        // Create raw network socket.
+        int sock = socket(AF_INET, SOCK_RAW, IPPROTO_RAW);
+
+        // Step 2 Set Socket option.
+        setsockopt(sock, IPPROTO_ICMP, IP_HDRINCL, &enable, sizeof(enable));
+
+        // Step 3 provide needed information about destination.
+        dest_info.sin_family = AF_INET;
+        dest_info.sin_addr = ip->iph_destip;
+
+        //Step 4 send the packet out
+        sendto(sock, ip, ntohs(ip->iph_len), 0,
+                        (struct sockaddr *)&dest_info, sizeof(dest_info));
+        close(sock);
+}
+```
+I have changed the Ip protocol to ICMP here, that is the only change I have made from the book's code.
+
+With the packet constructed, the checksum calculated, and then sent out through the socket we can finally start looking at some results.
+
+I have made my program an interface to facilitate showing for both tasks in 2.2 sending spoofed packets (ICMP uses IP) and will post the wireshark capture so you can see that it does in fact work.
+
+Here is the program spoofing an arbitrary IP address:
+
+![spoofing](img/spoofing.png)
 
 #### Task 2.2B Spoof an ICMP echo request.
 
+For this task we use the spoof program to send an ICMP echo request on behalf of the Host container from the attacker container, we capture the replies on our Container network interface. I chose to ping my school's student server (MacEwan University in Edmonton).
+
+![allthepings](img/allthepings.png)
+
+Interestingly when I send out 10 packets I only receive two responses. This is either because my packets are being sent too quickly, or the server will only respond to a set number or ICMP requests/second. But when I send one packet at a time from the attacker container masquerading as the host machine we can see that the MacEwan student server responds with a reply to my spoofed packet.
+	
 #### Questions
 
 ##### 4.
+The IP packet length cannot be set to an arbitrary value. For several reasons. If you set the ip length higher than the packet actually is, then the packet will become padded with zeros, so yes you can increase the size of your packet, but there is a limit As defined in RFC 791, the maximum packet length of an IPv4 packet including the IP header is 65,535 (216 − 1) bytes, and before we even think of making a packet that large we would need to fragment the packet because of the maximum transmission unit(MTU) across an ethernet wire. Trying to jam a very large packet onto the network will get error'd out by the socket before it is sent. playing with my code a bit, I can increse the size of my echo requests, but not to an arbitrary value. The largest I was able to make the packet length as was 1042 bytes.
+
+![1042](1042.png)
+
+According to the man page if the message size is too large, then sendto() , the socket function we use to send our packet, will also report an errormessage EMSGSIZE. This means in order to increase the size of the message further we would need to handle breaking it down atomically in the code.
+ 
 ##### 5.
+
+Using raw socket programming we do not need to calculate the checksum for the IP header because the operating system does this for us. When we are working with higher level protocols, such as tcp, udp, icmp we need to calculate their checksums.
+
 ##### 6.
+
+Similar to question 2. We need root privilege to run programs with raw sockets because it is required by the kernel as a security measure to protect the system. When the OS uses the socket system calls it has a UID attached to the process and the process of creating/using a raw socket will not be allowed unless your UID is 0 (root) or you have certain privileges assigned to your program (CAP_NET_RAW). 
 
 
 ### TASK 2.3 Sniff and Then Spoof
