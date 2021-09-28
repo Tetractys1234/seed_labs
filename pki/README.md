@@ -39,13 +39,14 @@ Here we can see the constraints of our certificate. Which is as a CA.
 
 ![x509constraint](img/x509constraint.png)
 
-We know that this certificate is self signed by looking at the issuer field of the certificat
+We know that this certificate is self signed by looking at the issuer field of the certificate
 
 ![x509issuer](img/x509issuer.png)
 
 Identifying the values in the certificate file:
 
-We have the Modulus of the RSA algorithm in our certificate file as well as the public exponent stored. This is the 'n' value and the 'e' value respectively.
+We have the Modulus of the RSA algorithm in our certificate file as well as the public exponent stored. This is the 'n' value and the 'e' value respectivelying the `openssl rsa -in ca.key -text -noout`
+
 ![rsapublic](img/rsapublic.png)
 
 If we want to get more information we need to access the the password protected key file. This will give us the rest of the values needed to perform the RSA encryption algortihm
@@ -64,5 +65,61 @@ Our public and private exponents are the values e, and d respectively:
 
 ### Task 2: Generating a Certificate Request for your Web Server
 ------------------------------------------------------------------
+
+We are going to create a webserver called sabinek2021. We need to get a public-key certificate from our newly made CA. We will need to generate a Certificate Signing Request, which includes the company's name and information, send the request to the CA which will verify the identity information of the request and grant a certificate.
+
+I ran this command to generate the key of my sabinek2021 webserver, the lab instructs us further to add in some alternative domains to be accepted with the same certificate so I will add in the `-addext "subject AltName = [Names]':
+
+```
+openssl req -newkey rsa:2048 -sha256 \
+-keyout server.key -out server.csr \
+-subj "/CN=www.sabinek2021.com/O=sabinek2021 Inc./C=CA" \
+-addext "subjectAltName = DNS: www.sabinek2021.com, \
+			  DNS: www.sabinek2021A.com, \
+			  DNS: www.sabinek2021B.com"\
+-passout pass:dees
+```
+So lets take a look at the files we created for our webserver's certificate.
+
+Run the commands:
+```
+openssl req -in server.csr -text -noout
+openssl rsa -in server.key -text -noout
+```
+So we have generated the requests lets take a look:
+
+![csr](img/csr.png)
+
+We can see the request of my webserver here.
+
+![serverkey](img/serverkey.png)
+
+And here is (part) of the server key.
+
+### TASK 3: Generating a Certificate for your server
+------------------------------------------------------
+
+We need to turn our CSR into a certificate for our webserver signed by our made up Certificate authority. 
+
+We run the following openssl command to accomplish this:
+`
+openssl ca -config myCA_openssl.cnf -policy policy_anything \
+-md sha256 -days 3650 \
+-in server.csr -out server.crt -batch \
+-cert ca.crt -keyfile ca.key
+`
+
+Specifically we use our copied config file, not the systems own and we use "policy_anything" when defining the policy. policy_anything is not the default policyy, it has less restrictions than the default when matching the CSR to the CA's certificate. 
+
+We need to go back into our config file and uncomment the copy_extensions line, this will allow us to copy the extension fields to the webserver certificate.
+
+**NOTE** I had to restart the process here because I had not set up the directories properly. Make sure to read your config file and manual carefully!! You need to set up the proper directories and files in order for our openssl config file to properly function. After I got it all sorted out I was able to create the certificate for my webserver and it includes all of the domain names I specified.
+
+![servercert](img/servercert.png)
+
+
+### Task 4: Deploying Certificate in an Apache-Based HTTPS Website
+--------------------------------------------------------------------
+
 
 
