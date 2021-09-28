@@ -121,5 +121,7 @@ We need to go back into our config file and uncomment the copy_extensions line, 
 ### Task 4: Deploying Certificate in an Apache-Based HTTPS Website
 --------------------------------------------------------------------
 
+We need to create our files on the docker container setting up the sabinek2021 webserver. We need to create a ssl config file for our server first. this will specify where our keys are stored, where the website's files are stored and where the certificate is stored as well.
+
 
 
