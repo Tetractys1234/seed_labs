@@ -131,7 +131,7 @@ The filter worked!
 
 ### TASK 1.2 Spoofing ICMP Packets
 
-We have already used spoofed packets to easily test our filter settings, but lets go over the deatils here. Scapy makes it really intuitive to create spoofed packets.
+We have already used spoofed packets to easily test our filter settings, but lets go over the details here. Scapy makes it really intuitive to create spoofed packets.
 
 ```python
 # We will construct a ICMP packet layer by layer and send it
