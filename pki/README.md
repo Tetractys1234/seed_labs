@@ -181,7 +181,7 @@ We can see evidence that the requests are being sent to our webserver by using w
 
 But our browser will warn us that the certificate we have does not match the domain name. Our certificate was registered with www.sabinek2021.com, www.sabinek2021A.com, and www.sabinek2021B.com, not to www.tdcanadatrust.com. 
 
-![mitmsite](mitmsite.png)
+![mitmsite](img/mitmsite.png)
 
 We have already added an exception to our CA in our browser so the traffic should go through to any certificate signed by our bogus CA. If we were to go through the process of signing another fake certificate for https://www.tdcanadatrust.com AND simulate the DNS poisoning then we would receive no warning and proceed directly to the fake webpage we are hosting on the server on the victim machine.
 
@@ -199,7 +199,9 @@ Say we have the private key of a certificate authority, this will allow us to cr
 
 We first need to create the certificate and key of the bogus webpage. So we will spoof credentials of tdcanadatrust and use them with our openssl command.
 
+and we succeed! We now own a certificate claiming to be owned by www.tdcanadatrust.com and can utilize it on our webserver
 
+![compromisedCA](img/compromisedCA.png)
 
 
  
