@@ -186,7 +186,7 @@ But our browser will warn us that the certificate we have does not match the dom
 We have already added an exception to our CA in our browser so the traffic should go through to any certificate signed by our bogus CA. If we were to go through the process of signing another fake certificate for https://www.tdcanadatrust.com AND simulate the DNS poisoning then we would receive no warning and proceed directly to the fake webpage we are hosting on the server on the victim machine.
 
 
-### TASK 6: Launching a Man-In-The-Middle Attack wwith a Compromised CA
+### TASK 6: Launching a Man-In-The-Middle Attack with a Compromised CA
 ------------------------------------------------------------------------
 
 So what if the CA is compromised and we sign a certificate for https://www.tdcanadatrust.com with our CA?
