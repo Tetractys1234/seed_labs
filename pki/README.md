@@ -203,5 +203,7 @@ and we succeed! We now own a certificate claiming to be owned by www.tdcanadatru
 
 ![compromisedCA](img/compromisedCA.png)
 
+Now go back to the apache server and edit the config we used in the last task to use our new certificate and key, enable the site, and restart the apache2 service. We should now be able to navigate to our fake website owned by 'TD Canada Trust'
 
+![compromisedsite](img/compromisedsite.png)
  
