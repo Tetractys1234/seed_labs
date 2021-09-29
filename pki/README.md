@@ -206,4 +206,9 @@ and we succeed! We now own a certificate claiming to be owned by www.tdcanadatru
 Now go back to the apache server and edit the config we used in the last task to use our new certificate and key, enable the site, and restart the apache2 service. We should now be able to navigate to our fake website owned by 'TD Canada Trust'
 
 ![compromisedsite](img/compromisedsite.png)
+
+
+#### Conclusion
+
+PKI gives us a powerful tool to provide authentication that the communications we are sending and receiving are in fact valid. This infrastructure is not perfect and has been the targets of attacks in the past. Just look at the case of [Diginotar](https://www.wired.com/2011/09/diginotar-bankruptcy/) , a Certificate authority who was compromised in 2011 and went bankrupt as a result. So long as we trust the Certificate Authority, we know that the communication is secure and we are not being a victim of a man-in-the-middle attack. So check your certificates!
  
