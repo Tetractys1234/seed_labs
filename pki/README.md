@@ -164,3 +164,42 @@ Clicking on the lock icon in the address bar we can view our site's certificate 
 -------------------------------------------------
 
 So how does the PKI defeat MITM(Man-In-The-Middle) attacks? 
+
+![mitmfig](img/mitmfig.png)
+
+We will try the method of attack here. Firstly I need to make the webserver container have a local host with a popular website's name. Lets try https://www.tdcanadatrust.com
+
+I will create a website on the apache server with that domain name, using our self signed certificate to validate it. This will obviosuly be an invalid certificate, but the point here is to show that we can route a victim's traffic to our webserver.
+
+Once we set up the https://www.tdcanadatrust.com virtualhost with apache wwe also need to modify the /etc/hosts folder on our VM machine to emulate the result of DNS cache poisoning and reroute the VM's traffic to our webserver. 
+
+The browser will then take us to https://www.tdcanadatrust.com, but the https will first be routed through our machine.
+
+We can see evidence that the requests are being sent to our webserver by using wireshark over its network interface
+
+![mitmtraffic](img/mitmtrafic.png)
+
+But our browser will warn us that the certificate we have does not match the domain name. Our certificate was registered with www.sabinek2021.com, www.sabinek2021A.com, and www.sabinek2021B.com, not to www.tdcanadatrust.com. 
+
+![mitmsite](mitmsite.png)
+
+We have already added an exception to our CA in our browser so the traffic should go through to any certificate signed by our bogus CA. If we were to go through the process of signing another fake certificate for https://www.tdcanadatrust.com AND simulate the DNS poisoning then we would receive no warning and proceed directly to the fake webpage we are hosting on the server on the victim machine.
+
+
+### TASK 6: Launching a Man-In-The-Middle Attack wwith a Compromised CA
+------------------------------------------------------------------------
+
+So what if the CA is compromised and we sign a certificate for https://www.tdcanadatrust.com with our CA?
+
+First we will need to go through the process. We need to create a certificate and self-sign it with our compromised CA in order to get the browser to navigate directly to our website without any warnings given by the browser.
+
+##### Step 1: Create a certificate signed by the compromised CA.
+
+Say we have the private key of a certificate authority, this will allow us to create any number of certificates that will appear legitamately signed by our CA.
+
+We first need to create the certificate and key of the bogus webpage. So we will spoof credentials of tdcanadatrust and use them with our openssl command.
+
+
+
+
+ 
