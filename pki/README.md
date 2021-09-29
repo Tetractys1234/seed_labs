@@ -177,7 +177,7 @@ The browser will then take us to https://www.tdcanadatrust.com, but the https wi
 
 We can see evidence that the requests are being sent to our webserver by using wireshark over its network interface
 
-![mitmtraffic](img/mitmtrafic.png)
+![mitmtraffic](img/mitmtraffic.png)
 
 But our browser will warn us that the certificate we have does not match the domain name. Our certificate was registered with www.sabinek2021.com, www.sabinek2021A.com, and www.sabinek2021B.com, not to www.tdcanadatrust.com. 
 
