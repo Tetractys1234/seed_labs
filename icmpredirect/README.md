@@ -70,3 +70,19 @@ Wireshark showing ARP request to remote machine:
 
 #####2. Can we use ICMP redirect attacks to redirect traffic to a non-existing machine on the same network segment?
 
+We will try to redirect packets to a non-existant machine on the same network segment as our victim. Changing the gateway destination (icmp.gw) to a non-existant machine on the same network results in the same result as trying to change the value of the gateway to a remote machine. The redirect is taken be the host which then tries to update its routing table by sending an ARP request for the specified address. The address does not exist, so the routing is not updated. See icmpnonexist.py for the ip address I tested with.
+
+![nonexistantmachine](img/nonexistantmachine.png)
+
+#####3. Looking at the docker-compose.yml file we can see the redirect configuration for our malicious router is set to 0 in all respects, meaning that our router will not send ICMP redirect messages out. We can change the values and relaunch our successful attack from task 1 to see why.
+
+First we edit the sysctl entries in the docker-compose file, then we need to build the container network again, run icmpredirect.py on the attacker machine then observe the traffic with wireshark. Turning these vaulues to 1 will allow our malicious router to send out redirect packets, which it then does since it has found a more direct route for the traffic coming from the victim's machine, this negates our whole attack!
+
+![redirectredirect](img/redirectredirect.png)
+
+We can see in this wireshark capture that the host receives the first redirect, sends a packet out on the redirected route, to which our malicious router responds with a redirect route back to the original gateway.
+
+#Task 2 Launching the MITM Attack
+-------------------------------------
+
+ 
