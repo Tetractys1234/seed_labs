@@ -85,4 +85,21 @@ We can see in this wireshark capture that the host receives the first redirect, 
 #Task 2 Launching the MITM Attack
 -------------------------------------
 
+In order to launch a MITM attack with our current container configurations. We must turn off port forwarding from our malicious router in order to intercept and modify packets from the victim's machine. We do this in the docker compose config file. On the line `# sysctl net.ipv4.ip_forward=0`. 
+
+Next we need to redirect traffic from the victim machine using icmpredirect.py. Now when any transmissions are made through our router, no traffic leaves the network segment because port forwarding is off.
+
+We are provided by SEED labs a sample python code to intitiate our MITM attack such that we intercept packets from the victim's machine and modify them. This requires us to filter for packets with a source addresss matching our victim, then we parse the payload of a nc session (TCP), replace my name 'keith' with 'AAAAA' in the payload, then forward the modified packet to the original destination (192.168.60.5). 
+
+![proof](img/proof.png)
+
+**NOTE** The sample code provided gives us a challenge to modify the filter so that we are only retransmitting our intercepted packets and not ALL packets on the interface of the router. So we use the BPF filter expression in the scapy sniff() function `"tcp and src host 10.9.0.5"`. Filtering this way ensures we are only forwarding tcp packets from our intended victim's machine.
+
+###Questions
+
+#####4. In the MITM program you only need to capture traffic in one direction. Which direction and why?
+
+Traffic needs to be captured from the victim's machine ONLY and to the specific destination that we have set up the ICMP redirect for. This needs to be the case because the ICMP redirect only functions in that direction from host to destination. The gateway coming back from the destination 192.168.60.5 will know how to route back to 10.9.0.5 without sending traffic through our malicious router because the routing table on the default gateway has not changed, only the routing from the victim to the destination has changed from the ICMP redirect.
+
+#####5. What is better to choose? The IP address or the MAC address.
  
