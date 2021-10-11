@@ -21,7 +21,7 @@ In the Ubuntu OS there is a countermeasure against ICMP redirect attacks. The Co
 
 We will attack the Victim container from the Attacker container. Checking the routing on our victim container
 
-![victimroute](img/victimroute)
+![victimroute](img/victimroute.png)
 
 We see that the Victim container uses the container router to get to the 192.168.60.0/24 network.
 
@@ -61,5 +61,12 @@ We can also show the routing cache with the command 'ip route show cache'
 
 #### **Questions**
 
-1. Can we use ICMP redirect attacks to redirect to a remote machine?
+#####1. Can we use ICMP redirect attacks to redirect to a remote machine?
+No. ICMP redirect does not redirect traffic to a remote machine, this is because a remote machine would require the packets to be first sent through a gateway to a machine off the network. Since a remote machine is not on the same internet segment (subnet), ARP will be used to determine if that route is indeed on the same subnet. When it can't find the remote machine then the redirect address is not stored in the routing cache. RFC 1222 section 3.2.2.2 defines that redirect messages require the host to update its routing table. So when the host machine tries to update its routing table it uses ARP to search for the remote machine on its segment, this fails and the redirect address is not stored. To test this I used the same icmpredirect.py, but changed the ICMP type 5 code 1 gateway message to be a remote machine (My university's student server). See icmpremote.py. I was then able to observe with wireshark the host machine searching for the remote server to redirect traffic to, this ARP request was not fulfilled so the routing of the host does not update.
+
+Wireshark showing ARP request to remote machine:
+
+![wiresharkremote](img/wiresharkremote.png)
+
+#####2. Can we use ICMP redirect attacks to redirect traffic to a non-existing machine on the same network segment?
 
