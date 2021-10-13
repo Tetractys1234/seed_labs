@@ -102,4 +102,16 @@ We are provided by SEED labs a sample python code to intitiate our MITM attack s
 Traffic needs to be captured from the victim's machine ONLY and to the specific destination that we have set up the ICMP redirect for. This needs to be the case because the ICMP redirect only functions in that direction from host to destination. The gateway coming back from the destination 192.168.60.5 will know how to route back to 10.9.0.5 without sending traffic through our malicious router because the routing table on the default gateway has not changed, only the routing from the victim to the destination has changed from the ICMP redirect.
 
 #####5. What is better to choose? The IP address or the MAC address.
- 
+Choosing the IP address in the filter will create some issues with the code because it is sniffing for IP packets with the source IP as 10.9.0.5 this will mean the program will continuously retransmit the same packet. The code will sniff the spoofed tcp packets as they go out and retransmit them. Demonstrated with mitm.py
+
+![spuriousretransmission](img/spuriousretransmission.png)
+
+Using the MAC address in the packet filter in scapy will ensure we are not capturing the spoofed packets and transmitting them continuously, we only want to retransmit the packets from our victim machine, not our own. Demonstrated in mitmether.py
+
+![etherlevel](img/etherlevel.png)
+
+Alternatively if you want to use the IP address you could write a more complex filter for the sniffing program. Something like `"src host 10.9.0.5 and not ether src [Malicious Router MAC]"` This negates the spurious retransmissions and uses the IP address. I demonstrate the filter with mitmIP_negateattacker.py
+
+![ipnotether](img/ipnotether.png)
+
+
