@@ -15,6 +15,6 @@ def spoof_pkt(pkt):
         send(newpkt/newdata)
     else:
         send(newpkt)
-f = 'tcp and src 10.9.0.5'
+f = 'tcp and ether src 02:42:0a:09:00:05'
 
 pkt = sniff(iface='eth0', filter=f, prn=spoof_pkt)
