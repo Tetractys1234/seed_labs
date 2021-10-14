@@ -1,13 +1,13 @@
 ARP Cache Poisoning Attack Lab
 -------------------------------
 
-#Overview
+# Overview
 ---------
 
 Address Resolution Protocol is a communication protocol used for discovering link layer addresses. It is a simple protocol that does not implement any securit measures. 
 
 
-#Lab Environment
+# Lab Environment
 ----------------
 
 To complete this lab I am using the lab setup provided by the [SEED security labs](https://seedsecuritylabs.org/Labs_20.04/Files/ARP_Attack/ARP_Attack.pdf).
@@ -103,7 +103,7 @@ And we can see in A's ARP cache the address is changed to the correct location o
 
 The question in the Lab simply asks if it works, the answer is yes it does work, but it is destined to fail if you try to use the request packet in a man in the middle situation.
 
-#Task1.B Using ARP reply
+## Task1.B Using ARP reply
 
 So lets construct an ARP reply packet and see if that will work better than the request. So we need to keep all of the values the same, except this time we will change the code `op = 2` in the spoofed packet from 1 to 2.
 
@@ -134,7 +134,7 @@ This time A ignores the ARP reply indicating where B is located
 
 A has no need to store B's address because a request has not been sent. So we only cache M in A's ARP cache, which is less than ideal.
 
-#TASK 1.C
+# TASK 1.C
 -------------------
 
 Scenario 1: B is in A's Cache
@@ -164,7 +164,7 @@ We see the same amount of traffic broadcast over the network.
 And we can see that M's address becomes mapped to B's IP. Success!
 
 
-Task 2: MITM Attack on Telnet using ARP Cache poisoning
+# Task 2: MITM Attack on Telnet using ARP Cache poisoning
 -----------------------------------------------------------
 
 Now we need to use M as a MITM to intercept telnet traffic between A and B. So we will need to use the ARP Cache poisoning to change A's arp cache so that B's IP maps to M's IP, and B's arp cache so that A's address maps to M. So all packets sent between A and B will be intercepted by M.
@@ -216,7 +216,7 @@ B:
 ![arpcacheB](img/arpcacheB.png)
 
 
-##Step 3: Testing MITM attack (with IP forwarding)
+## Step 3: Testing MITM attack (with IP forwarding)
 Now we will turn on IP forwarding (either with python or `sysctl net.ipv4.ip_forward=1`) and see if machine M forwards the echo requests and replies without giving up its mitm position.
 
 Here is the sequence of 4 ping requests being sent from machine A:
@@ -232,7 +232,7 @@ It is interesting that the ARP protocol eventually does have to reveal our machi
 
 ![mrevealed](img/mrevealed.png)
  
-##Step 4: Launching the MITM attack
+## Step 4: Launching the MITM attack
 
 We are given some skeleton code to try from the SEED Lab. So I need to figure out how to change each letter we are sending through Telnet to a fixed letter, I will use 'J' as the letter. My code is in mitmARP.py
 
