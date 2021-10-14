@@ -246,4 +246,17 @@ For our sniffing program we need to create a BPF filter expression such that we 
 
 I will use the filter expression `filter = 'tcp and not ether src 02:42:0a:09:00:69'` This should prevent the sniffer from retransmitting packets that it generates itself.
 
+With the ARP cache poisoned I make a telnet connection from A to B using the SEED credentials. Then I run mitmARP.py on M to intercept the packets. And as we can see the telnet client changes every letter typed into my desired 'J' character. This does seem to mess up the Telnet session though, as once I have typed I can no longer send a return command to my telnet shell.
 
+![telnetJ](img/telnetJ.png)
+
+Following the tcp stream of the telnet session we can see where I was typing into A's client, and what the server was telling A it typed:
+
+![telnettcp](img/telnettcp.png)
+
+
+# Task 3: MITM Attack on Netcat using ARP Cache Poisoning
+
+Similar to the next lab ICMP Redirect, we will now do a MITM attack on netcat instead of telnet. netcat will transmit a whole message instead of character by character so we will edit mitmARP.py to change each occurence of my name, keith, to a sequence of 'JJJJJ'. 
+
+I will follow the same steps as in task 2. We will poison the caches, connect via netcat, and then initiate the mitm attack. Be sure to turn on port forwarding on M first to initate the connection.
