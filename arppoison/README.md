@@ -99,6 +99,7 @@ The real 10.9.0.6 follows up with an ARP response broadcasted over the network s
 
 And we can see in A's ARP cache the address is changed to the correct location of 10.9.0.6 and also our machine 10.9.0.105 has been revealed to both A and B and no traffic will be routed between them anymore unless we resend the spoofed ARP request. So this isn't really ideal for a man in the middle situation.
 
+![ping](img/ping.png)
 
 #Task1.B Using ARP reply
 
