@@ -117,7 +117,7 @@ When we run arpconstructreply.py with B's address in the cache we can see that t
 
 The IP address for B is overwritten by M's spoofed ARP, but we have the same problem. 10.9.0.105 has no idea how to communicate with 10.9.0.5 even though it has a MAC address, so the transmission begins with an ARP request from the M machine
 
-![bincache](bincache.png)
+![bincache](img/bincache.png)
 
 This is followed by the spoofed ARP reply packet we sent.
 
@@ -130,7 +130,7 @@ We have the same sequence of ARP packets when we send out the spoofed ARP from 1
 
 This time A ignores the ARP reply indicating where B is located
 
-![bnotcache](img/bnotcache)
+![bnotcache](img/bnotcache.png)
 
 A has no need to store B's address because a request has not been sent. So we only cache M in A's ARP cache, which is less than ideal.
 
