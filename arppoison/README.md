@@ -93,7 +93,7 @@ We see the ping get sent out to our machine's address (M)
 
 But our machine has no idea where 10.9.0.6 is, which causes it to broadcast an ARP request over the network trying to find 10.9.0.6
 
-The real 10.9.0.6 follows up with an ARP response broadcasted over the network segment letting all the machines connected know that it is actually located at. Now our Machine updates its ARP cache sends the ping from 10.9.0.105 to 10.9.0.6. Since the source of the packet is 10.9.0.5 and machine B has never communicated with it before, it sends out an ARP request to fill in its ARP cache with A's information. At this point a duplicate entry is detected in A's ARP cache and now the whole network knows that the ARP cache was wrong to begin with.
+The real 10.9.0.6 follows up with an ARP response broadcasted over the network segment which fills in M's ARP cache for B's address. Now our Machine updates its ARP cache sends the ping from 10.9.0.105 to 10.9.0.6. Since the source of the packet is 10.9.0.5 and machine B has never communicated with it before, it sends out an ARP request to fill in its ARP cache with A's information. When A receives the broadcast a duplicate entry is detected in A's ARP cache and now the whole network knows that the ARP cache was wrong to begin with and it gets updated with the proper addresses.
 
 ![duplicatedetected](img/duplicatedetected.png) 
 
@@ -101,10 +101,39 @@ And we can see in A's ARP cache the address is changed to the correct location o
 
 ![doesrequestwork](img/doesrequestwork.png)
 
+The question in the Lab simply asks if it works, the answer is yes it does work, but it is destined to fail if you try to use the request packet in a man in the middle situation.
+
 #Task1.B Using ARP reply
 
-So lets construct an ARP reply packet and see if that will work better.
+So lets construct an ARP reply packet and see if that will work better than the request. So we need to keep all of the values the same, except this time we will change the code `op = 2` in the spoofed packet from 1 to 2.
 
 Scenario 1: B's IP is already in A's cache.
+
+From the last experiment B is already in A's cache, but I will delete the other entries from the other machines using `arp -d [entry name]`. Again I just change the code of the arp packet we created in arpconstruct.py, I will make a seperate file arpconstructreply.py to use for this task.
+
+When we run arpconstructreply.py with B's address in the cache we can see that the result gets us the same as when we sent the reply with no cache data in A.
+
+![resultBincache](img/resultBincache.png)
+
+The IP address for B is overwritten by M's spoofed ARP, but we have the same problem. 10.9.0.105 has no idea how to communicate with 10.9.0.5 even though it has a MAC address, so the transmission begins with an ARP request from the M machine
+
+![bincache](bincache.png)
+
+This is followed by the spoofed ARP reply packet we sent.
+
 Scenario 2: B's IP is not in A's cache.
+
+So what if B's IP is not in A's cache? Again I will reset the experiment using `arp -d [entryname]` on all entries in A.
+We have the same sequence of ARP packets when we send out the spoofed ARP from 10.9.0.105
+
+![resultbnotcached](img/resultbnotcached.png)
+
+This time A ignores the ARP reply indicating where B is located
+
+![bnotcache](img/bnotcache)
+
+A has no need to store B's address because a request has not been sent. So we only cache M in A's ARP cache, which is less than ideal.
+
+#TASK 1.C
+-------------------
 

