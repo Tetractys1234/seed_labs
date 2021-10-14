@@ -257,6 +257,20 @@ Following the tcp stream of the telnet session we can see where I was typing int
 
 # Task 3: MITM Attack on Netcat using ARP Cache Poisoning
 
-Similar to the next lab ICMP Redirect, we will now do a MITM attack on netcat instead of telnet. netcat will transmit a whole message instead of character by character so we will edit mitmARP.py to change each occurence of my name, keith, to a sequence of 'JJJJJ'. 
+Similar to the next lab ICMP Redirect, we will now do a MITM attack on netcat instead of telnet. netcat will transmit a whole message instead of character by character so we will edit mitmARP.py to change each occurence of my name, keith, to a sequence of 'AAAAA'. 
 
-I will follow the same steps as in task 2. We will poison the caches, connect via netcat, and then initiate the mitm attack. Be sure to turn on port forwarding on M first to initate the connection.
+I will follow the same steps as in task 2. We will poison the caches, connect via netcat, and then initiate the mitm attack. Be sure to turn on port forwarding on M first when initiating the connection.
+
+![ncsesh](img/ncsesh.png)
+
+We can see that we have intercepted the packets and are retransmitting them from M.
+
+Wireshark shows the edited packets as a retransmission
+
+![wsharkrt](img/wsharkrt.png)
+
+If we follow the TCP stream we only get the client side of the story.
+
+![nctcp](img/nctcp.png)
+
+
