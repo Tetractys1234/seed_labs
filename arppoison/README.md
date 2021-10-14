@@ -137,3 +137,40 @@ A has no need to store B's address because a request has not been sent. So we on
 #TASK 1.C
 -------------------
 
+Scenario 1: B is in A's Cache
+
+Now we will examine the same two scenarios as in TASK 1.B with a ARP gratuitous message. The ARP gratuitous packet is a special ARP packet used when a host needs to update outdated information on ALL the other machine's ARP caches. 
+
+So how to construct the gratuitous packet? We set the destination address as the broadcast MAC address `ff:ff:ff:ff:ff:ff` and keep the sender addresses the same (B's addresses). We also keep 10.9.0.5 as the target. Check out garpconstruct.py for the code.
+
+Since a gratuitous ARP packet is meant to update existing tables it is no surprise when we activate the code on M we see this traffic
+
+![garpincache](img/garpincache.png)
+
+And we see A's cache has been updated with M's Mac address mapped to B's IP address.
+
+![garped](img/garped.png)
+
+Scenario 2: B is not in A's Cache
+
+Lets delete the entry for B in A's cache and try the GARP packet again.
+
+![wsharkbnotcached](img/wsharkbnotcached.png)
+
+We see the same amount of traffic broadcast over the network.
+
+![garped2](img/garped2.png)
+
+And we can see that M's address becomes mapped to B's IP. Success!
+
+
+Task 2: MITM Attack on Telnet using ARP Cache poisoning
+-----------------------------------------------------------
+
+Now we need to use M as a MITM to intercept telnet traffic between A and B. So we will need to use the ARP Cache poisoning to change A's arp cache so that B's IP maps to M's IP, and B's arp cache so that A's address maps to M. So all packets sent between A and B will be intercepted by M.
+
+![mitmfig](img/mitmfig.png)
+
+This image was again from the [SEED security lab](https://seedsecuritylabs.org/Labs_20.04/Files/ARP_Attack/ARP_Attack.pdf) documents I am using to learn about ARP attacks.
+
+So lets get to Scapy! We will use the same idea from task 1 to conduct the MITM attack.
