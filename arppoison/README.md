@@ -173,4 +173,77 @@ Now we need to use M as a MITM to intercept telnet traffic between A and B. So w
 
 This image was again from the [SEED security lab](https://seedsecuritylabs.org/Labs_20.04/Files/ARP_Attack/ARP_Attack.pdf) documents I am using to learn about ARP attacks.
 
-So lets get to Scapy! We will use the same idea from task 1 to conduct the MITM attack.
+So lets get to Scapy! We will use the same idea from task 1 to conduct the MITM attack. 
+
+##Step 1: Launch the ARP cache poisoning Attack
+I have defined the ARP cache poisoning in mitmARP.py as
+
+```python3
+# This function will Map B's address to M in A's cache, and A's
+# Address to M in B's cache.
+def arp_poison():
+    ether = Ether(dst = 'ff:ff:ff:ff:ff:ff')
+    arp1 = ARP(op = 2, hwdst = 'ff:ff:ff:ff:ff:ff',hwsrc = '02:42:0a:09:00:69', psrc = IP_B, pdst = IP_A)
+    arp2 = ARP(op = 2, hwdst = 'ff:ff:ff:ff:ff:ff',hwsrc = '02:42:0a:09:00:69', psrc = IP_A, pdst = IP_B)
+
+    sendp(ether/arp1)
+    sendp(ether/arp2)
+```
+
+We are sending ou the spoofed gratuitous arp to land M in both A and B's cache.
+
+For the first try of our attack we will test and observe the results when ip forwarding is disabled on M. We can quickly do this without resetting our containers by launching python in M and running the following:
+
+```python3
+>>> import os
+>>> os.system('echo 1 > /proc/sys/net/ipv4/ip_forward')           # enable kernel IP forwarding
+>>> os.system('echo 0 > /proc/sys/net/ipv4/ip_forward')           # disable kernel IP forwarding
+```
+
+Source: [The art of packet crafting with Scapy!](https://0xbharath.github.io/art-of-packet-crafting-with-scapy/network_attacks/arp_spoofing/index.html)
+
+## Step 2: Testing MITM Attack (without IP forward)
+The attack is successful! We have mapped the traffic to flow through M, but the traffic will not flow through M because we have disabled IP forwarding.
+
+![ipdisable](img/ipdisable.png)
+
+It makes sense that no traffic goes through, but we can see the attack has worked successfully on both A and B's cache:
+
+A:
+![arpcacheA](img/arpcacheA.png)
+
+B:
+![arpcacheB](img/arpcacheB.png)
+
+
+##Step 3: Testing MITM attack (with IP forwarding)
+Now we will turn on IP forwarding (either with python or `sysctl net.ipv4.ip_forward=1`) and see if machine M forwards the echo requests and replies without giving up its mitm position.
+
+Here is the sequence of 4 ping requests being sent from machine A:
+
+![fourping](img/fourping.png)
+
+Wireshark gives us a security warning that no responses are seen for the ping, and that M is sending what appear to be redirect packets out. This is actually false, the code on the ICMP packets from M is actually 0. If we step through each redirect we can see that our machine is receiving the requests and replies then sending them to their intended destination. I also have the arppoison.py running on M every 3 seconds, so the ARP cache's of A and B are always addressing M when they are communicating between eachother.
+
+Here is our M machine redirecting a ICMP packet:
+![mitmredirect](img/mitmredirect.png)
+
+It is interesting that the ARP protocol eventually does have to reveal our machine on M. I would like to find a way to keep it hidden.
+
+![mrevealed](img/mrevealed.png)
+ 
+##Step 4: Launching the MITM attack
+
+We are given some skeleton code to try from the SEED Lab. So I need to figure out how to change each letter we are sending through Telnet to a fixed letter, I will use 'J' as the letter. My code is in mitmARP.py
+
+We are also given some instructions on how to conduct our experiment.
+
+First we need to keep IP forwarding on to create a Telnet connection between A and B, once that connection is established we turn off the IP forwarding.
+
+We then run the sniff-then-spoof program on M such that we edit the traffic between A and B, and for Telnet response packets we do no editing (From B to A keep the packet the same).
+
+For our sniffing program we need to create a BPF filter expression such that we are only retransmitting the correct packets.
+
+I will use the filter expression `filter = 'tcp and not ether src 02:42:0a:09:00:69'` This should prevent the sniffer from retransmitting packets that it generates itself.
+
+
