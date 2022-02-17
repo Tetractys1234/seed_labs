@@ -535,3 +535,20 @@ Ongoing Security Considerations
 
 Managing a mail server will require administrators to regularly review the important logs, apply security updates to packages being used, and configuring the spam filter as needed for its users. There are other considerations to make as well, you need to verify that mail is being sent consistently, depending on where you are hosting the mail server you may be given a Senderscore that is lower than what most filtering systems will allow, causing your mail to never reach its destination. 
 
+References
+------------------------------------------------------------------------------
+
+[ OpenBSD Frequently Asked Question](https://www.openbsd.org/faq/)
+
+[Setting up a mail server with OpenSMTPD, Dovecot and Rspamd](https://poolp.org/posts/2019-09-14/setting-up-a-mail-server-with-opensmtpd-dovecot-and-rspamd/)
+
+[An OpenBSD E-Mail Server Using OpenSMTPD, Dovecot, Rspamd, and RainLoop](https://www.vultr.com/docs/an-openbsd-e-mail-server-using-opensmtpd-dovecot-rspamd-and-rainloop)
+
+[Dovecot manual](https://doc.dovecot.org/)
+
+[Rspamd quick start](https://rspamd.com/doc/quickstart.html)
+
+[OpenBSD manpages](https://man.openbsd.org/)
+
+[Rainloop Webmail](https://www.rainloop.net/)
+
