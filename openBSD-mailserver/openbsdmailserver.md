@@ -498,3 +498,9 @@ server "test4.cs.macewan.ca" {
 ```
 
 As we can see it is accessing the rainloop application directory when test4.cs.macewan.ca is requested. It will return the request using our self-signed certificate. Once the rainloop package is running and we restart the httpd daemon we can navigate to the portal and access webmail of the users we have created.
+
+## Ongoing Security Considerations
+---------------------------------------------------------------------------
+
+Managing a mail server will require administrators to regularly review the important logs, apply security updates to packages being used, and configuring the spam filter as needed for its users. There are other considerations to make as well, you need to verify that mail is being sent consistently, depending on where you are hosting the mail server you may be given a Senderscore that is lower than what most filtering systems will allow, causing your mail to never reach its destination. 
+
