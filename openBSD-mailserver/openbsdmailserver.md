@@ -1,10 +1,10 @@
-**REPORT C380 TERM PROJECT 1
+# REPORT C380 TERM PROJECT 1
 -----------------------------------------------------
 In this term project we have been tasked with setting up and securing a linux/unix server machine. Our group chose to go with implementing a mail server on the openBSD operating system. We chose openBSD because the operating system is designed with proactive security as its number one design decision. OpenBSD is an operating system that is shipped "secure by default" and when we install the operating system we see that all non-essential services to the machine running are disabled. This forces the administrators of the system to carefully consider implications of enabling a new service or daemon as they will need to be configured to suit the system manually by an administrator.
 
 The following report will detail, step-by-step, our process of setting up the mail server with openBSD from the start and the steps we took along the way to secure the system.
 
-**System Setup and Installation
+## System Setup and Installation
 ------------------------------------------------------
 
 We aquired the iso file from the openBSD website.[openBSD](https://www.openbsd.org/faq/faq4.html#Download). Since it is a disk image we can not cryptographically verify it. We have to trust that the image we downloaded from openBSD.org is not in fact a rogue installation file. We are reasonably sure that this is not a rogue installation. The file was taken from [install70.iso](https://cdn.openbsd.org/pub/OpenBSD/7.0/i386/install70.iso).
@@ -74,7 +74,7 @@ And we can verify it by grep-ing the group file
 
 ![getentgroup](img/getentgroup.png)
 
-****Security Feature
+#### Security Feature
 Now that we have our administrative user accounts set up it is important to disable the root login completely. It is no longer needed and we do not want to risk root actions being without any accountability. The sudo command allows for any command to be logged under /var/log/secure when executed with sudo so we can track what commands have been executed with elevated privileges.
 
 Before we disable the account completely though we configure the ssh daemon and lock it down against any brute force attacks, since this machine will be facing the internet a first point of attack could be the ssh credentials. So what we will do is edit the sshd_conf located in /etc/ssh directory.
@@ -88,11 +88,11 @@ We have changed these settings such that we will only allow users to connect via
 
 We now have SSHD configured as we want it we can restart the service with `rcctl restart sshd` and our changes should be applied immediately.
 
-****Continuing with afterboot:
+#### Continuing with afterboot:
 
 We have configured the logins for the machine so we can continue going through the afterboot checklist. The next item after login is the Root password, we have already changed this. Next we confirm that the time is correct. The time has been set correctly so we can move on.
 
-*****Checking our hostname:
+##### Checking our hostname:
 Our hostname is tp1g4.test4.cs.macewan.ca: This is correct
 
 Checking our network interface config and routing tables:
@@ -103,7 +103,7 @@ Checking our network interface config and routing tables:
 
 Everything seems correct here.
 
-*****Mail:
+##### Mail:
 
 This is the system mailer, not to be confused with the mail server to be set up later on in the report. It handles mailing out system information using smtpd. We will need to modify the smtpd.conf later.
 
@@ -119,14 +119,14 @@ These daily/monthly reports are mailed to the root@hostname, which is defined in
 
 As you can see I have directed all mail to the sabinek account so I can be notified of system file changes.
 
-*****Checking Disk mounts:
+##### Checking Disk mounts:
 
 OpenBSD, by default, mounts each main directory off root to its own partition, this is for security purposes. We can change which are writable/readable easily without affecting the other systems on the machine. We can also easily allocate space allowed to be used for each partition. Since we are creating a mail server we will implement them in such a way that if the mail server stores so much data it will not bring the system down due to full disk usage.
 
 ![partitions](img/partitions.png)
 
 
-****Security feature IDS Script Implemented by Rudra Patel
+#### Security feature IDS Script Implemented by Rudra Patel
 
 A feature that was created for server security is the IDS (Intrusion Detection System). Although OpenBSD natively has a feature to check for any changes for files and permissions, we have created an IDS that checks specific directories relating to the server files, client, and logs. The script made for the IDS was adapted from [Calomel](https://calomel.org/ids_mtree.html) in the mtree section, Calomel is an open-source research and reference site.
 Now I will go into how the script works. In the bash script I created a new directory /etc/ids which contains all files relating to the IDS, this will include the bash script and all the hash files for each directory the IDS will monitor.
@@ -194,15 +194,15 @@ If the user instead wishes to verify the integrity of the files, the script woul
 Finally, the script will send the verification report in “temp” to all root accounts. When the mail is sent to the root accounts, if the directories that we are monitoring where to have changes, the report will display the path of the directory that changed, modification time and the changed checksum value, however if there are no changes, the report will only include the checksum values and the directory paths. Before exiting, the script will remove the “temp” file and log the operation in system log.
 
 
-**** End of OpenBSD Installation and System Configuration
+#### End of OpenBSD Installation and System Configuration
 
 These were the steps we took to secure our operating system and implement some features of our own. The openBSD operating system comes with many security features enabled, some of which have been detailed here.
 
-*** Application installation, configuration, and hardening
+### Application installation, configuration, and hardening
 
 In order to implement the mailserver we will use openSMTP, dovecot, and rspamd. To make use of the mailserver we will also install the web application Rainloop. Following is a step by step report on how we installed and configured each package.
 
-**** Errata concerning Mail
+#### Errata concerning Mail
 
 In order to implement a Mail Server that WORKS with a web mail client we need to ensure that the DNS records are correct for our server. Without a proper DNS configuration pointing to our server we will not be able to send or receive mail. Also a DNS configuration pointing to our mail server is needed to implement DKIM, DMARC, and SPF.
 
@@ -211,7 +211,7 @@ Side note: this portion of the project seems like it would work well in a networ
 It is completely possible for us to set up these mechanisms, but we would need to be able to access the domain records and edit the TXT records in order to enable these mechanisms which will allow us to have a functioning mail server that will be able to send and receive emails.
 
 If we are not able to implement DKIM we will not be able to verify that our Mail Server is sending messages, which means our mail server could be impersonated by a malicious machine and send mail on our behalf. Not to mention most other mail servers will reject any messages being sent from a domain with no DKIM, depending on their DMARC policy.
-SOURCE: https://datatracker.ietf.org/doc/html/rfc4686
+[SOURCE](https://datatracker.ietf.org/doc/html/rfc4686)
 
 The same is true for our Server, we need to be able to verify any Domain that is sending mail to our server and we need to apply a DMARC policy to incoming mail. As an ongoing investigation into the security of our server we need to be able to review feedback of DMARC reports in order to ensure our server is sending mail correctly.
 
@@ -220,7 +220,6 @@ We also need to have a TLS certificate in place to ensure our mail cannot be mod
 For a proof of concept mail server we have generated a TLS certificate that is self signed, this is to make sure we can use HTTPS on the web application, and sign our mail traffic.
 
 What we would need in order to make this a functioning mail server are the following records in DNS:
-
 ```
 #  Ideal entries for DNS test4.cs.macewan.ca
 MX record
@@ -236,7 +235,7 @@ test4.cs.macewan.ca.	IN TXT	"v=spf1 mx -all"
 _dmarc.test4.cs.macewan.ca.	IN TXT	"v=DMARC1;p=none;pct=100;rua=mailto:postmaster@test4.cs.macewan.ca
 ```
 
-**** OpenSMTP
+#### OpenSMTP
 
 The following file is located in /etc/mail/smtpd.conf and is responsible for configuring the smtp daemon.
 
@@ -286,11 +285,11 @@ The `action` lines define actions that the smtp daemon will take. local_mail fol
 
 The `match from/for` lines do exactly what you might expect, it tells the smtp daemon how to match specific traffic with a specific action as defined above.
 
-**** Security Feature: Set credentials to read-only for _smtpd and _dovecot system users.
+##### Security Feature: Set credentials to read-only for _smtpd and _dovecot system users.
 
 We don't want any system user to be able to read our virtual mail credentials as they are private. So we set them to only be readable by the packages that require them. Namely OpenSMTP and Dovecot.
 
-**** Dovecot
+#### Dovecot
 
 In order for users to be able to interact with their mail in a human readable way we need to configure a IMAP and POP3 server, and Dovecot can achieve this for us. Following is our local.conf for dovecot. located in /etc/dovecot/local.conf
 
