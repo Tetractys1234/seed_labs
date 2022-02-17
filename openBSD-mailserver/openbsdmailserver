@@ -1,0 +1,91 @@
+Group 4 Term Project 1
+
+
+Creating a Mail Server OpenBSD 7.0 with Qemu on Vinet emulator.
+
+
+Installing OpenBSD
+----------------------
+
+We first need to install openBSD. I have downloaded the 7.0 iso file from openBSD.org and then used sftp to get the file on the vinet server.
+
+Using the QEMU Virtual machine manager I load the ISO and begin the installation process
+Install process:
+
+(I) for install
+(us) for keyboard layout
+tp1g4 hostname
+Configuring Network Interface:
+-------------------------------------
+Network mask: 	204.209.21.0/24
+-------------------------------------
+Gateway: 	204.209.21.1
+-------------------------------------
+IP : 		204.209.21.244
+-------------------------------------
+DNS Hostname:	test4.cs.macewan.ca
+DNS : 		
+		10.62.8.10
+		10.62.9.10
+--------------------------------------
+
+Password for root account:
+dxyG43hJklmao! [ changed later ]
+
+start sshd by default
+X window system: No
+set up user:
+
+sabinek
+[none]
+
+root disk:
+default
+Use Whole disk
+Auto layout
+Install File sets (default)
+Set local time
+
+Reboot:
+
+
+Create users that need to SSH into system: (term project members):
+  User	   Pass
+|_________+___________________|
+| hochom  | MuTQ9!RbM&m/>+Sh  |
+| patalr  | P-"@=&Khcyu(C4("  |
+| sabinek | c?!YD4W9zvQUj)wj  |
+-------------------------------
+
+SSH is configured by OS installation so it works when connecting
+via ip address.
+
+Now disable login by root. Any root actions must be done with root
+password.
+
+Added the sudo package. placed sabinek,patalr, and hochom into the wheel group
+and now the sudo command can be used to perform administrative tasks by the group.
+
+Securing ssh with SSH keys
+
+Installing required packages for our system;
+opensmtpd-extras opensmtpd-filter-rspamd dovecot dovecot-pigeonhole rspamd redis
+
+Update system.
+
+Generate self signed certificates for DKIM and TLS/SSL: 
+
+DKIM:
+/etc/mail/dkim/test4.dkim.key
+/etc/mail/dkim/test4.dkim.pub
+
+SSL
+/etc/ssl/test4mail.crt
+/etc/ssl/private/test4mail.key
+
+8gkDmNVwc693isC
+
+
+
+
+
