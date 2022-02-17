@@ -1,10 +1,41 @@
-# REPORT C380 TERM PROJECT 1
------------------------------------------------------
+\begin{titlepage}
+   \begin{center}
+       \vspace*{1cm}
+
+       \textbf{Term Project 1: Unix Mail Server}
+
+       \vspace{0.5cm}
+        CMPT 380 Term Project 1
+
+       \vspace{1.5cm}
+
+       \textbf{Keith Sabine, Rudra Patel, Mohammed Hocho}
+
+       \vfill
+
+   \end{center}
+\end{titlepage}
+
+
+# 	REPORT C380 TERM PROJECT 1
+#### Term Project 1: CMPT 380 Winter 2022, Prof. Calin Anton
+#### Keith Sabine, Rudra Patel, Mohammed Hocho
+
+### Table of Contents
+1.	[Introduction](#Introduction)
+2.	[System Setup and Installation](#System-Setup-and-Installation)
+3.	[Application installation, configuration, and hardening](#Application-installation,-configuration,-and hardening)
+4.	[Ongoing Security Considerations](#Ongoing-security-considerations)
+
+Introduction
+----------------------------------
+
 In this term project we have been tasked with setting up and securing a linux/unix server machine. Our group chose to go with implementing a mail server on the openBSD operating system. We chose openBSD because the operating system is designed with proactive security as its number one design decision. OpenBSD is an operating system that is shipped "secure by default" and when we install the operating system we see that all non-essential services to the machine running are disabled. This forces the administrators of the system to carefully consider implications of enabling a new service or daemon as they will need to be configured to suit the system manually by an administrator.
 
 The following report will detail, step-by-step, our process of setting up the mail server with openBSD from the start and the steps we took along the way to secure the system.
 
-## System Setup and Installation
+
+System Setup and Installation
 ------------------------------------------------------
 
 We aquired the iso file from the openBSD website.[openBSD](https://www.openbsd.org/faq/faq4.html#Download). Since it is a disk image we can not cryptographically verify it. We have to trust that the image we downloaded from openBSD.org is not in fact a rogue installation file. We are reasonably sure that this is not a rogue installation. The file was taken from [install70.iso](https://cdn.openbsd.org/pub/OpenBSD/7.0/i386/install70.iso).
@@ -198,7 +229,7 @@ Finally, the script will send the verification report in “temp” to all root 
 
 These were the steps we took to secure our operating system and implement some features of our own. The openBSD operating system comes with many security features enabled, some of which have been detailed here.
 
-## Application installation, configuration, and hardening
+Application installation, configuration, and hardening
 -----------------------------------------------------------------------
 
 In order to implement the mailserver we will use openSMTP, dovecot, and rspamd. To make use of the mailserver we will also install the web application Rainloop. Following is a step by step report on how we installed and configured each package.
@@ -499,7 +530,7 @@ server "test4.cs.macewan.ca" {
 
 As we can see it is accessing the rainloop application directory when test4.cs.macewan.ca is requested. It will return the request using our self-signed certificate. Once the rainloop package is running and we restart the httpd daemon we can navigate to the portal and access webmail of the users we have created.
 
-## Ongoing Security Considerations
+Ongoing Security Considerations
 ---------------------------------------------------------------------------
 
 Managing a mail server will require administrators to regularly review the important logs, apply security updates to packages being used, and configuring the spam filter as needed for its users. There are other considerations to make as well, you need to verify that mail is being sent consistently, depending on where you are hosting the mail server you may be given a Senderscore that is lower than what most filtering systems will allow, causing your mail to never reach its destination. 
