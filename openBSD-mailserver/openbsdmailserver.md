@@ -198,7 +198,8 @@ Finally, the script will send the verification report in “temp” to all root 
 
 These were the steps we took to secure our operating system and implement some features of our own. The openBSD operating system comes with many security features enabled, some of which have been detailed here.
 
-### Application installation, configuration, and hardening
+## Application installation, configuration, and hardening
+-----------------------------------------------------------------------
 
 In order to implement the mailserver we will use openSMTP, dovecot, and rspamd. To make use of the mailserver we will also install the web application Rainloop. Following is a step by step report on how we installed and configured each package.
 
@@ -235,7 +236,7 @@ test4.cs.macewan.ca.	IN TXT	"v=spf1 mx -all"
 _dmarc.test4.cs.macewan.ca.	IN TXT	"v=DMARC1;p=none;pct=100;rua=mailto:postmaster@test4.cs.macewan.ca
 ```
 
-#### OpenSMTP
+### OpenSMTP
 
 The following file is located in /etc/mail/smtpd.conf and is responsible for configuring the smtp daemon.
 
@@ -289,7 +290,7 @@ The `match from/for` lines do exactly what you might expect, it tells the smtp d
 
 We don't want any system user to be able to read our virtual mail credentials as they are private. So we set them to only be readable by the packages that require them. Namely OpenSMTP and Dovecot.
 
-#### Dovecot
+### Dovecot
 
 In order for users to be able to interact with their mail in a human readable way we need to configure a IMAP and POP3 server, and Dovecot can achieve this for us. Following is our local.conf for dovecot. located in /etc/dovecot/local.conf
 
@@ -458,5 +459,42 @@ exec /usr/local/bin/rspamc -d "${1}" learn_ham
 exec /usr/local/bin/rspamc -d "${1}" learn_spam
 ```
 
+### rspamd
 
+The final package we need to configure to get mail working properly is rspamd which is a open source spam filtering system for mail, but it also has many other features It provides dkim signing, antivirus integration, and a lot of different modules you can use to fine tune a mail server setup. We have rspamd congiured to handle DKIM-signing and spam filtering features as defined in this article. [SOURCE](https://poolp.org/posts/2019-09-14/setting-up-a-mail-server-with-opensmtpd-dovecot-and-rspamd/)
 
+The only configuration we need to look at is how to sign our mail for DKIM. Unfortunately this feature will not work unless we have control of DNS records, so for now rspamd is just handled when dovecot calls its filtering sieves.
+
+### Rainloop webmail client
+
+In order to configure a web client we use the HTTP daemon httpd to handle https requests coming to our server. Here is our configuration file located at `/etc/httpd.conf`
+
+```
+server "test4.cs.macewan.ca" {
+        listen on * tls port 443
+        tls {
+                certificate "/etc/ssl/test4mail.crt"
+                key "/etc/ssl/private/test4mail.key"
+        }
+        log {
+                access  "test4.cs.macewan.ca-access.log"
+                error   "test4.cs.macewan.ca-error.log" 
+        }
+
+        root "/rainloop"
+        directory index index.php
+
+        # security
+        location "*/.git*"      { block }
+        ## app specific
+        location "/data/*"      { block }
+        # robots.txt
+        location "/robots.txt"  { pass }
+
+        location "/*.php" {
+                fastcgi socket "/run/php-fpm.sock"
+        }
+}
+```
+
+As we can see it is accessing the rainloop application directory when test4.cs.macewan.ca is requested. It will return the request using our self-signed certificate. Once the rainloop package is running and we restart the httpd daemon we can navigate to the portal and access webmail of the users we have created.
