@@ -1,10 +1,10 @@
 **REPORT C380 TERM PROJECT 1
-
+-----------------------------------------------------
 In this term project we have been tasked with setting up and securing a linux/unix server machine. Our group chose to go with implementing a mail server on the openBSD operating system. We chose openBSD because the operating system is designed with proactive security as its number one design decision. OpenBSD is an operating system that is shipped "secure by default" and when we install the operating system we see that all non-essential services to the machine running are disabled. This forces the administrators of the system to carefully consider implications of enabling a new service or daemon as they will need to be configured to suit the system manually by an administrator.
 
 The following report will detail, step-by-step, our process of setting up the mail server with openBSD from the start and the steps we took along the way to secure the system.
 
-***System Setup and Installation
+**System Setup and Installation
 ------------------------------------------------------
 
 We aquired the iso file from the openBSD website.[openBSD](https://www.openbsd.org/faq/faq4.html#Download). Since it is a disk image we can not cryptographically verify it. We have to trust that the image we downloaded from openBSD.org is not in fact a rogue installation file. We are reasonably sure that this is not a rogue installation. The file was taken from [install70.iso](https://cdn.openbsd.org/pub/OpenBSD/7.0/i386/install70.iso).
@@ -377,5 +377,87 @@ protocol imap {
 ``` 
 
 In this configuration file we set up the configuration for our IMAP and POP3 server. The first line:
-`auth mechanisms` defines which authentication mechanisms we wish to use: here we supply it with plain because we have the login credentials set up per-user
+`auth mechanisms` defines which authentication mechanisms we wish to use: here we supply it with plain because we have the login credentials set up per-user. 
+
+`first_valid_uid/gid = 2000` -- This defines the system user we have assigned to handle the virtual users our mail client will handle.
+
+`mail_location` defines the directory in which users' mail will be stored on the system.
+
+`mail_plugin_dir` defines where the various plugins we will use with dovecot are installed on the system.
+
+`managesieve_notify_capability` and `managesieve_sieve_capability` defines where any sieve notifications are sent to and what information the sieve service receives before any authentication is performed. This is part of the pigeonhole plugin.
+
+`mbox_write_locks` this line specifies we will use fnctl to control locking files when writing to them.
+
+`mmap_disable` this disables the mmap functionality in which files are mapped into memory [Source](https://man7.org/linux/man-pages/man2/mmap.2.html)
+
+`namespace inbox` this defines the inbox view users will have when accessing their mail, included here are Inbox, Archive, Drafts, Junk, Sent, and Trash
+
+`passdb` here we have specified the credentials file we defined in the smtpd.conf, it is where the credentials for our virtual users are found.
+
+`plugin` this defines the plugin we are using, namely the pigeonhole plugin. This configuration uses a reporting script written which determines if incoming mail is junk o rnot
+
+`protocols` this determines the protocols we will be using with dovecot: imap for user login and sieve.
+
+`ssl_*` this defines for dovecot where our self signed certificate is stored.
+
+`userdb` we define the user database for our system, also assign to it a driver. We are using the passwd file configuration for our virtual mail users.
+
+Some additional configuration steps were also taken for dovecot in the /etc/login.conf file in order to facilitate it being able to open and read many files at once.
+
+```
+#
+# Package specific classes
+#
+dovecot:\
+	:openfiles-cur=1024:\
+	:openfiles-max=2048:\
+	:tc=daemon:
+```
+
+In order to make use of rspamd we create scripts to handle spam and ham, for our mail server simply moving maill into and out of the junk folder will trigger an event in which rspamd responds to:
+
+in report-ham.sieve:
+```
+require ["vnd.dovecot.pipe", "copy", "imapsieve", "environment", "variables"];
+
+if environment :matches "imap.mailbox" "*" {
+  set "mailbox" "${1}";
+}
+
+if string "${mailbox}" "Trash" {
+  stop;
+}
+
+if environment :matches "imap.user" "*" {
+  set "username" "${1}";
+}
+
+pipe :copy "sa-learn-ham.sh" [ "${username}" ];
+```
+
+and report-spam.sieve
+```
+require ["vnd.dovecot.pipe", "copy", "imapsieve", "environment", "variables"];
+
+if environment :matches "imap.user" "*" {
+  set "username" "${1}";
+}
+
+pipe :copy "sa-learn-spam.sh" [ "${username}" ];
+```
+
+These scripts are compled with sievec and moved to `/usr/local/lib/dovecot/sieve`
+
+and in order to implement the scripts we need to write two shell scripts: sa-learn-ham.sh and sa-learn-spam.sh which simply call exec on rspamc with an argument and the sieve script name:
+
+```
+#!/bin/sh
+exec /usr/local/bin/rspamc -d "${1}" learn_ham
+
+#!/bin/sh
+exec /usr/local/bin/rspamc -d "${1}" learn_spam
+```
+
+
 
